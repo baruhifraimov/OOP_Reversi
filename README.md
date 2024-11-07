@@ -65,3 +65,5 @@ Implement `Disc` interface for different disc types:
 ---
 
 Good luck!
+
+## BARUH IFRAIMOV

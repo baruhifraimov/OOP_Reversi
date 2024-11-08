@@ -4,7 +4,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
+// here we will add readme for the application.
 public class Main {
     /**
      * The Main function to start the game.

@@ -1,8 +1,12 @@
 import java.util.List;
 
 public class GameLogic implements PlayableLogic{
+    Player p1,p2;
+
     @Override
     public boolean locate_disc(Position a, Disc disc) {
+
+
         return false;
     }
 
@@ -13,7 +17,7 @@ public class GameLogic implements PlayableLogic{
 
     @Override
     public int getBoardSize() {
-        return 0;
+        return 8;
     }
 
     @Override
@@ -28,22 +32,23 @@ public class GameLogic implements PlayableLogic{
 
     @Override
     public Player getFirstPlayer() {
-        return null;
+        return this.p1;
     }
 
     @Override
     public Player getSecondPlayer() {
-        return null;
+        return this.p2;
     }
 
     @Override
     public void setPlayers(Player player1, Player player2) {
-
+        p1 = player1;
+        p2 = player2;
     }
 
     @Override
     public boolean isFirstPlayerTurn() {
-        return false;
+        return p1.isPlayerOne;
     }
 
     @Override

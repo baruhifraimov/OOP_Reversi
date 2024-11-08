@@ -1,5 +1,6 @@
 public class UnflippableDisc implements Disc {
     public UnflippableDisc(Player currentPlayer) {
+        
     }
 
     @Override

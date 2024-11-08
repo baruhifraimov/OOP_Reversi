@@ -1,3 +1,4 @@
+
 public abstract class Player {
     protected boolean isPlayerOne; // Indicates whether the player is a defender or attacker
     protected int wins;

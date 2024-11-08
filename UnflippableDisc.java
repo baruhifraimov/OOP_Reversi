@@ -1,4 +1,4 @@
-public class UnflippableDisc implements Disc{
+public class UnflippableDisc implements Disc {
     public UnflippableDisc(Player currentPlayer) {
     }
 

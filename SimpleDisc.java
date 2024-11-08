@@ -1,4 +1,4 @@
-public class SimpleDisc implements Disc{
+public class SimpleDisc implements Disc {
     public SimpleDisc(Player currentPlayer) {
     }
 

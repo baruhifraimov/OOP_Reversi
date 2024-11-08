@@ -1,4 +1,4 @@
-public class BombDisc implements Disc{
+public class BombDisc implements Disc {
     public BombDisc(Player currentPlayer) {
     }
 

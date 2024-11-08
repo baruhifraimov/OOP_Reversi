@@ -1,7 +1,7 @@
 public class BombDisc implements Disc {
 
     public BombDisc(Player currentPlayer) {
-
+        currentPlayer.reduce_bomb();
     }
 
     @Override

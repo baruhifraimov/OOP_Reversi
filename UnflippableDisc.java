@@ -1,6 +1,7 @@
 public class UnflippableDisc implements Disc {
+
     public UnflippableDisc(Player currentPlayer) {
-        
+
     }
 
     @Override
@@ -15,6 +16,6 @@ public class UnflippableDisc implements Disc {
 
     @Override
     public String getType() {
-        return "";
+        return "⭕";
     }
 }

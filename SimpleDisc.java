@@ -1,5 +1,7 @@
 public class SimpleDisc implements Disc {
+
     public SimpleDisc(Player currentPlayer) {
+
     }
 
     @Override
@@ -14,6 +16,6 @@ public class SimpleDisc implements Disc {
 
     @Override
     public String getType() {
-        return "";
+        return "⬤";
     }
 }

@@ -1,5 +1,7 @@
 public class BombDisc implements Disc {
+
     public BombDisc(Player currentPlayer) {
+
     }
 
     @Override
@@ -14,6 +16,6 @@ public class BombDisc implements Disc {
 
     @Override
     public String getType() {
-        return "";
+        return "💣";
     }
 }

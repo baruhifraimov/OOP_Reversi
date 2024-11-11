@@ -1,5 +1,5 @@
 public class SimpleDisc implements Disc {
-    Player p;
+    private Player p;
 
     public SimpleDisc(Player currentPlayer) {
         this.p = currentPlayer;

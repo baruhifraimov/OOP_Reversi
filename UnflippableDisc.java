@@ -1,5 +1,5 @@
 public class UnflippableDisc implements Disc {
-    Player p;
+    private Player p;
 
     public UnflippableDisc(Player currentPlayer) {
         this.p = currentPlayer;

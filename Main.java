@@ -91,7 +91,7 @@ public class Main {
                 dispose();
             });
 
-            
+
             // Add components to the dialog
             add(firstPlayerLabel);
             add(firstPlayerCombo);

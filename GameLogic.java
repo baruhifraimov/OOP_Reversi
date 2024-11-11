@@ -1,25 +1,48 @@
 import java.util.List;
 
-public class GameLogic implements PlayableLogic{
-    Player p1,p2;
+public class GameLogic implements PlayableLogic {
+    private final int BOARDSIZE = 8;
+    private Player p1, p2;
+    private Disc[][] boardDiscs = new Disc[BOARDSIZE][BOARDSIZE]; // Locating disc position on the board
+    private Player lastPlayer; //Checks who was last
+
+//    public GameLogic() {
+//        initBoard(); //initiating the board
+//    }
+
+    private void initBoard() {
+        boardDiscs = new Disc[BOARDSIZE][BOARDSIZE];
+        int midBoard = BOARDSIZE / 2;
+        boardDiscs[midBoard][midBoard] = new SimpleDisc(p1);
+        boardDiscs[midBoard - 1][midBoard - 1] = new SimpleDisc(p1);
+        boardDiscs[midBoard][midBoard - 1] = new SimpleDisc(p2);
+        boardDiscs[midBoard - 1][midBoard] = new SimpleDisc(p2);
+    }
 
     @Override
     public boolean locate_disc(Position a, Disc disc) {
-
-
-        return true;
+        if (lastPlayer!=p1) {
+            boardDiscs[a.row()][a.col()] = disc;
+            lastPlayer = p1;
+            return true;
+        } else {
+            boardDiscs[a.row()][a.col()] = disc;
+            lastPlayer = p2;
+            return true;
+        }
     }
 
     @Override
     public Disc getDiscAtPosition(Position position) {
-        return null;
+        return boardDiscs[position.row()][position.col()];
     }
 
     @Override
     public int getBoardSize() {
-        return 8;
+        return BOARDSIZE;
     }
 
+    //A valid move is one where at least one piece is reversed (flipped over).
     @Override
     public List<Position> ValidMoves() {
         return List.of();
@@ -27,6 +50,22 @@ public class GameLogic implements PlayableLogic{
 
     @Override
     public int countFlips(Position a) {
+        //UP
+        for (int i = a.col(); i < ; i++) {
+
+        }
+        //DOWN
+        for (int i = a.col(); i < ; i++) {
+
+        }
+        //RIGHT
+        for (int i = a.row(); i < ; i++) {
+
+        }
+        //LEFT
+        for (int i = a.row(); i < ; i++) {
+
+        }
         return 0;
     }
 
@@ -42,13 +81,13 @@ public class GameLogic implements PlayableLogic{
 
     @Override
     public void setPlayers(Player player1, Player player2) {
-        p1 = player1;
-        p2 = player2;
+        this.p1 = player1;
+        this.p2 = player2;
     }
 
     @Override
     public boolean isFirstPlayerTurn() {
-        return p1.isPlayerOne;
+        return lastPlayer!=p1;
     }
 
     @Override
@@ -58,7 +97,7 @@ public class GameLogic implements PlayableLogic{
 
     @Override
     public void reset() {
-
+        initBoard();
     }
 
     @Override

@@ -1,17 +1,19 @@
 public class BombDisc implements Disc {
+    private Player p;
 
     public BombDisc(Player currentPlayer) {
+        this.p = currentPlayer;
         currentPlayer.reduce_bomb();
     }
 
     @Override
     public Player getOwner() {
-        return null;
+        return this.p;
     }
 
     @Override
     public void setOwner(Player player) {
-
+        this.p = player;
     }
 
     @Override

@@ -11,6 +11,7 @@ public class GameLogic implements PlayableLogic {
 //    }
 
     private void initBoard() {
+
         boardDiscs = new Disc[BOARDSIZE][BOARDSIZE];
         int midBoard = BOARDSIZE / 2;
         boardDiscs[midBoard][midBoard] = new SimpleDisc(p1);
@@ -21,15 +22,16 @@ public class GameLogic implements PlayableLogic {
 
     @Override
     public boolean locate_disc(Position a, Disc disc) {
-        if (lastPlayer!=p1) {
+        if (lastPlayer!=p1 && boardDiscs[a.row()][a.col()] == null) {
             boardDiscs[a.row()][a.col()] = disc;
             lastPlayer = p1;
             return true;
-        } else {
+        } else if (boardDiscs[a.row()][a.col()] == null){
             boardDiscs[a.row()][a.col()] = disc;
             lastPlayer = p2;
             return true;
         }
+        return false;
     }
 
     @Override
@@ -50,26 +52,50 @@ public class GameLogic implements PlayableLogic {
 
     @Override
     public int countFlips(Position a) {
+        int flipCounter=0;
         //DOWN
-       for (int i = a.row(); i < getBoardSize()-1; i++) {
-               if(boardDiscs[i+1][a.col()].getOwner()==lastPlayer && di)
-               {
-
+       for (int i = a.row()+1; i < getBoardSize(); i++) {
+           if(boardDiscs[i][a.col()].getOwner() != null && boardDiscs[i][a.col()].getOwner()==lastPlayer  )
+           {
+                flipCounter++;
+           }
+           else {
+               break;
            }
         }
-        for (int i = a.col(); i < ; i++) {
-
+       //UP
+        for (int i = a.row()-1; i >= 0; i--) {
+            if(boardDiscs[i][a.col()].getOwner() != null && boardDiscs[i][a.col()].getOwner()==lastPlayer  )
+            {
+                flipCounter++;
+            }
+            else {
+                break;
+            }
         }
 
-        //LEFT+RIGHT
-        for (int i = a.row(); i < ; i++) {
-
+        //LEFT
+        for (int i = a.col()-1; i >= 0; i--) {
+            if(boardDiscs[a.row()][i].getOwner() != null && boardDiscs[a.row()][i].getOwner()==lastPlayer  )
+            {
+                flipCounter++;
+            }
+            else {
+                break;
+            }
         }
-        //DIAGONAL
-        for (int i = a.row(); i < ; i++) {
 
+        //RIGHT
+        for (int i = a.col()+1; i < getBoardSize(); i++) {
+            if(boardDiscs[a.row()][i].getOwner() != null && boardDiscs[a.row()][i].getOwner()==lastPlayer  )
+            {
+                flipCounter++;
+            }
+            else {
+                break;
+            }
         }
-        return 0;
+        return flipCounter;
     }
 
     @Override

@@ -37,6 +37,7 @@ public abstract class Player {
     public void addWin() {
         this.wins++;
     }
+
     /**
      * Determines whether this player is human.
      *
@@ -51,15 +52,25 @@ public abstract class Player {
     public int getNumber_of_unflippedable() {
         return number_of_unflippedable;
     }
+
     public void reduce_bomb() {
         number_of_bombs--;
     }
+
     public void reduce_unflippedable() {
         number_of_unflippedable--;
     }
+
     public void reset_bombs_and_unflippedable() {
         this.number_of_bombs = initial_number_of_bombs;
         this.number_of_unflippedable = initial_number_of_unflippedable;
     }
 
+    @Override
+    public String toString() {
+        if (isPlayerOne) {
+            return "Player 2";
+        }
+        return "Player 1";
+    }
 }

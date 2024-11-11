@@ -50,10 +50,17 @@ public class GameLogic implements PlayableLogic {
 
     @Override
     public int countFlips(Position a) {
-        //UP+DOWN
+        //DOWN
+       for (int i = a.row(); i < getBoardSize()-1; i++) {
+               if(boardDiscs[i+1][a.col()].getOwner()==lastPlayer && di)
+               {
+
+           }
+        }
         for (int i = a.col(); i < ; i++) {
 
         }
+
         //LEFT+RIGHT
         for (int i = a.row(); i < ; i++) {
 

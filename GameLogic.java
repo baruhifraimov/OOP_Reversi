@@ -50,19 +50,15 @@ public class GameLogic implements PlayableLogic {
 
     @Override
     public int countFlips(Position a) {
-        //UP
+        //UP+DOWN
         for (int i = a.col(); i < ; i++) {
 
         }
-        //DOWN
-        for (int i = a.col(); i < ; i++) {
-
-        }
-        //RIGHT
+        //LEFT+RIGHT
         for (int i = a.row(); i < ; i++) {
 
         }
-        //LEFT
+        //DIAGONAL
         for (int i = a.row(); i < ; i++) {
 
         }

@@ -95,6 +95,23 @@ public class GameLogic implements PlayableLogic {
                 break;
             }
         }
+
+        //DIAGONAL UP-RIGHT
+        for (int i = a.row()-1; i >= 0; i--) {
+            for (int j = a.col()+1; j < getBoardSize(); j++) {
+                if (boardDiscs[i][j].getOwner() != null && boardDiscs[i][j].getOwner() == lastPlayer) {
+                    flipCounter++;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        //DIAGONAL UP-LEFT
+
+        //DIAGONAL DOWN-RIGHT
+
+        //DIAGONAL DOWN-LEFT
         return flipCounter;
     }
 

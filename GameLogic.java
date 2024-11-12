@@ -189,6 +189,8 @@ public class GameLogic implements PlayableLogic {
     public void reset() {
         lastPlayer = p2;
         history.clear();
+        p1.reset_bombs_and_unflippedable();
+        p2.reset_bombs_and_unflippedable();
         initBoard();
     }
 

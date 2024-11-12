@@ -2,8 +2,8 @@ public class UnflippableDisc implements Disc {
     private Player p;
 
     public UnflippableDisc(Player currentPlayer) {
-        this.p = currentPlayer;
-        currentPlayer.reduce_unflippedable();
+            this.p = currentPlayer;
+            this.p.reduce_unflippedable();
     }
 
     @Override

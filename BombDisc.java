@@ -2,8 +2,8 @@ public class BombDisc implements Disc {
     private Player p;
 
     public BombDisc(Player currentPlayer) {
-        this.p = currentPlayer;
-        currentPlayer.reduce_bomb();
+            this.p = currentPlayer;
+            this.p.reduce_bomb();
     }
 
     @Override

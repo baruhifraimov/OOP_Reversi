@@ -13,7 +13,6 @@ public class UnflippableDisc implements Disc {
     @Override
     public void setOwner(Player player) {
         this.p = player;
-
     }
 
     @Override

@@ -3,7 +3,6 @@ public class BombDisc implements Disc {
 
     public BombDisc(Player currentPlayer) {
             this.p = currentPlayer;
-            this.p.reduce_bomb();
     }
 
     @Override

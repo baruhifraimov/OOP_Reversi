@@ -1,20 +1,19 @@
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 public class GameLogic implements PlayableLogic {
     private final int BOARDSIZE = 8;
     private Player p1, p2;
     private Disc[][] boardDiscs = new Disc[BOARDSIZE][BOARDSIZE]; // Locating disc position on the board
-    private Player lastPlayer; //Checks who was last
+    private Player lastPlayer = getSecondPlayer(); //Checks who was last
     LinkedList<Position> history = new LinkedList<>(); // Collects all the disc locations on the board
 
     public GameLogic() {
-
+        super();
     }
 
-    private Player beforeLastPlayer() {
+    private Player currentPlayer() {
         if (lastPlayer == p1) {
             return p2;
         }
@@ -37,18 +36,65 @@ public class GameLogic implements PlayableLogic {
         if (boardDiscs[a.row()][a.col()] == null) {
             if (lastPlayer != p1) {
                 disc.setOwner(p1);
-                boardDiscs[a.row()][a.col()] = disc;
-                history.addLast(new Position(a.row(), a.col()));
-                System.out.printf("Player 1 placed a %s in (%d,%d)\n", disc.getType(), a.row(), a.col());
-                System.out.println();
-                lastPlayer = p1;
+                if (disc.getType().equals("💣")) {
+                    if (p1.getNumber_of_bombs() > 0) {
+                        p1.reduce_bomb();
+                        boardDiscs[a.row()][a.col()] = disc;
+                        history.addLast(new Position(a.row(), a.col()));
+                        System.out.printf("Player 1 placed a %s in (%d,%d)\n No. of Bombs discs left: %d\n", disc.getType(), a.row(), a.col(), p1.getNumber_of_bombs());
+                        System.out.println();
+                        lastPlayer = p1;
+                    }
+                } else if (disc.getType().equals("⭕")) {
+                    if (p1.getNumber_of_unflippedable() > 0) {
+                        p1.reduce_unflippedable();
+                        boardDiscs[a.row()][a.col()] = disc;
+                        history.addLast(new Position(a.row(), a.col()));
+                        System.out.printf("Player 1 placed a %s in (%d,%d)\n No. of Unflippable discs left: %d\n", disc.getType(), a.row(), a.col(), p1.getNumber_of_unflippedable());
+                        System.out.println();
+                        lastPlayer = p1;
+                    }
+
+                } else if (disc.getType().equals("⬤")) {
+                    boardDiscs[a.row()][a.col()] = disc;
+                    history.addLast(new Position(a.row(), a.col()));
+                    System.out.printf("Player 1 placed a %s in (%d,%d)\n", disc.getType(), a.row(), a.col());
+                    System.out.println();
+                    lastPlayer = p1;
+                } else {
+                    return false;
+                }
+
             } else {
                 disc.setOwner(p2);
-                boardDiscs[a.row()][a.col()] = disc;
-                System.out.printf("Player 2 placed a %s in (%d,%d)\n", disc.getType(), a.row(), a.col());
-                history.addLast(new Position(a.row(), a.col()));
-                System.out.println();
-                lastPlayer = p2;
+                if (disc.getType().equals("💣")) {
+                    if (p2.getNumber_of_bombs() >= 0) {
+                        p2.reduce_bomb();
+                        boardDiscs[a.row()][a.col()] = disc;
+                        System.out.printf("Player 2 placed a %s in (%d,%d)\n No. of Bombs discs left: %d\n", disc.getType(), a.row(), a.col(), p2.getNumber_of_bombs());
+                        history.addLast(new Position(a.row(), a.col()));
+                        System.out.println();
+                        lastPlayer = p2;
+                    }
+                } else if (disc.getType().equals("⭕")) {
+                    if (p2.getNumber_of_unflippedable() >= 0) {
+                        p2.reduce_unflippedable();
+                        boardDiscs[a.row()][a.col()] = disc;
+                        System.out.printf("Player 2 placed a %s in (%d,%d)\n No. of Unflippeable discs left: %d\n", disc.getType(), a.row(), a.col(), p2.getNumber_of_unflippedable());
+                        history.addLast(new Position(a.row(), a.col()));
+                        System.out.println();
+                        lastPlayer = p2;
+                    }
+
+                } else if (disc.getType().equals("⬤")) {
+                    boardDiscs[a.row()][a.col()] = disc;
+                    System.out.printf("Player 2 placed a %s in (%d,%d)\n", disc.getType(), a.row(), a.col());
+                    history.addLast(new Position(a.row(), a.col()));
+                    System.out.println();
+                    lastPlayer = p2;
+                } else {
+                    return false;
+                }
             }
             return true;
         }
@@ -83,77 +129,112 @@ public class GameLogic implements PlayableLogic {
 
     @Override
     public int countFlips(Position a) {
-        int flipCounter = 0;
+        int flipCounter = 0, upCounter=0,downCounter=0,leftCounter=0,rightCounter=0,durCounter=0,dulCounter=0,ddrCounter=0,ddlCounter=0;
         //DOWN
         for (int i = a.row() + 1; i < BOARDSIZE; i++) {
-            if (boardDiscs[i][a.col()] != null && boardDiscs[i][a.col()].getOwner() == lastPlayer) {
-                flipCounter++;
-            } else {
+            if (boardDiscs[i][a.col()] != null && boardDiscs[i][a.col()].getOwner().equals(lastPlayer)) {
+                downCounter++;
+            }
+            else if (boardDiscs[i][a.col()] != null && boardDiscs[i][a.col()].getOwner().equals(currentPlayer())){
+                flipCounter += downCounter;
                 break;
+            }
+                else{
+                    break;
+
             }
         }
         //UP
         for (int i = a.row() - 1; i >= 0; i--) {
-            if (boardDiscs[i][a.col()] != null && boardDiscs[i][a.col()].getOwner() == lastPlayer) {
-                flipCounter++;
-            } else {
+            if (boardDiscs[i][a.col()] != null && boardDiscs[i][a.col()].getOwner().equals(lastPlayer)) {
+                upCounter++;
+            }
+            else if(boardDiscs[i][a.col()] != null && boardDiscs[i][a.col()].getOwner().equals(currentPlayer())){
+                flipCounter+= upCounter;
                 break;
+            }
+            else{
+                break;
+
+
             }
         }
         //LEFT
         for (int i = a.col() - 1; i >= 0; i--) {
-            if (boardDiscs[a.row()][i] != null && boardDiscs[a.row()][i].getOwner() == lastPlayer) {
-                flipCounter++;
-            } else {
+            if (boardDiscs[a.row()][i] != null && boardDiscs[a.row()][i].getOwner().equals(lastPlayer)) {
+                leftCounter++;
+            }
+            else if(boardDiscs[a.row()][i] != null && boardDiscs[a.row()][i].getOwner().equals(currentPlayer())){
+                flipCounter += leftCounter;
                 break;
+            }
+            else {
+                break;
+
+
             }
         }
         //RIGHT
         for (int i = a.col() + 1; i < BOARDSIZE; i++) {
-            if (boardDiscs[a.row()][i] != null && boardDiscs[a.row()][i].getOwner() == lastPlayer) {
-                flipCounter++;
-            } else {
+            if (boardDiscs[a.row()][i] != null && boardDiscs[a.row()][i].getOwner().equals(lastPlayer)) {
+                rightCounter++;
+            }
+            else if(boardDiscs[a.row()][i] != null && boardDiscs[a.row()][i].getOwner().equals(currentPlayer())){
+                flipCounter += rightCounter;
+                break;
+            }
+            else{
+                break;
+
+
+            }
+        }
+        // DIAGONAL UP RIGHT
+        for (int i = a.col() + 1, j = a.row() - 1; i < BOARDSIZE && j >= 0; i++, j--) {
+            if (boardDiscs[j][i] != null && boardDiscs[j][i].getOwner().equals(lastPlayer)) {
+                    durCounter++;
+                } else if(boardDiscs[j][i] != null && boardDiscs[j][i].getOwner().equals(currentPlayer())) {
+                flipCounter+= durCounter;
+                    break;
+                }
+            else{
+                break;
+            }
+            }
+
+        // DIAGONAL UP LEFT
+        for (int i = a.col() - 1, j = a.row() - 1; i >= 0 && j >= 0; i--, j--) {
+            if (boardDiscs[j][i] != null && boardDiscs[j][i].getOwner().equals(lastPlayer)) {
+                dulCounter++;
+            }
+            else if(boardDiscs[j][i] != null && boardDiscs[j][i].getOwner().equals(currentPlayer())){
+                flipCounter+=dulCounter;
+            }
+            else {
                 break;
             }
         }
-        DUR:
-        for (int i = a.col() + 1; i < BOARDSIZE; i++) {
-            for (int j = a.row() - 1; j >= 0; j--) {
-                if (boardDiscs[j][i] != null && boardDiscs[j][i].getOwner() == lastPlayer) {
-                    flipCounter++;
-                } else {
-                    break DUR;
-                }
+        // DIAGONAL DOWN RIGHT
+        for (int i = a.col() + 1, j = a.row() + 1; i < BOARDSIZE && j < BOARDSIZE; i++, j++) {
+            if (boardDiscs[j][i] != null && boardDiscs[j][i].getOwner().equals(lastPlayer)) {
+                ddrCounter++;
+            }
+            else if (boardDiscs[j][i] != null && boardDiscs[j][i].getOwner().equals(currentPlayer())){
+                flipCounter +=ddrCounter;
+            }else {
+                break;
             }
         }
-        DUL:
-        for (int i = a.col() - 1; i >= 0; i--) {
-            for (int j = a.row() - 1; j >= 0; j--) {
-                if (boardDiscs[j][i] != null && boardDiscs[j][i].getOwner() == lastPlayer) {
-                    flipCounter++;
-                } else {
-                    break DUL;
-                }
+        // DIAGONAL DOWN LEFT
+        for (int i = a.col() - 1, j = a.row() + 1; i >= 0 && j < BOARDSIZE; i--, j++) {
+            if (boardDiscs[j][i] != null && boardDiscs[j][i].getOwner().equals(lastPlayer)) {
+                ddlCounter++;
             }
-        }
-        DDR:
-        for (int i = a.col() + 1; i < BOARDSIZE; i++) {
-            for (int j = a.row() + 1; j < BOARDSIZE; j++) {
-                if (boardDiscs[j][i] != null && boardDiscs[j][i].getOwner() == lastPlayer) {
-                    flipCounter++;
-                } else {
-                    break DDR;
-                }
+            else if(boardDiscs[j][i] != null && boardDiscs[j][i].getOwner().equals(currentPlayer())){
+                flipCounter+=ddlCounter;
             }
-        }
-        DDL:
-        for (int i = a.col() - 1; i >= 0; i--) {
-            for (int j = a.row() + 1; j < BOARDSIZE; j++) {
-                if (boardDiscs[j][i] != null && boardDiscs[j][i].getOwner() == lastPlayer) {
-                    flipCounter++;
-                } else {
-                    break DDL;
-                }
+            else {
+                break;
             }
         }
         return flipCounter;
@@ -202,9 +283,21 @@ public class GameLogic implements PlayableLogic {
             //Undo: removing ⬤ from (4, 2)
             //Undo: flipping back ⬤ in (4, 3)
             System.out.printf("Undo: removing %s from (%d,%d)\n\n", boardDiscs[h_row][h_col].getType(), h_row, h_col);
-            lastPlayer = beforeLastPlayer();
-            boardDiscs[h_row][h_col] = null;
-            history.removeLast();
+            lastPlayer = currentPlayer();
+            if (boardDiscs[h_row][h_col].getType().equals("💣")) {
+                boardDiscs[h_row][h_col].getOwner().add_bomb();
+                System.out.printf("Restoring %s Bombs: %d left\n", lastPlayer.toString(), lastPlayer.getNumber_of_bombs());
+                boardDiscs[h_row][h_col] = null;
+                history.removeLast();
+            } else if (boardDiscs[h_row][h_col].getType().equals("⭕")) {
+                boardDiscs[h_row][h_col].getOwner().add_unflippedable();
+                System.out.printf("Restoring %s Bombs: %d left", lastPlayer.toString(), lastPlayer.getNumber_of_unflippedable());
+                boardDiscs[h_row][h_col] = null;
+                history.removeLast();
+            } else {
+                boardDiscs[h_row][h_col] = null;
+                history.removeLast();
+            }
 
         }
     }

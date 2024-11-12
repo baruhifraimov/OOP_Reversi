@@ -53,6 +53,14 @@ public abstract class Player {
         return number_of_unflippedable;
     }
 
+    public void add_bomb() {
+        number_of_bombs++;
+    }
+
+    public void add_unflippedable() {
+        number_of_unflippedable++;
+    }
+
     public void reduce_bomb() {
         number_of_bombs--;
     }

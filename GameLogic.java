@@ -8,7 +8,7 @@ public class GameLogic implements PlayableLogic {
     private Player p1, p2;
     private Disc[][] boardDiscs = new Disc[BOARDSIZE][BOARDSIZE]; // Locating disc position on the board
     private Player lastPlayer; //Checks who was last
-    LinkedList<Position> history = new LinkedList<>();
+    LinkedList<Position> history = new LinkedList<>(); // Collects all the disc locations on the board
 
     public GameLogic() {
 
@@ -188,6 +188,7 @@ public class GameLogic implements PlayableLogic {
     @Override
     public void reset() {
         lastPlayer = p2;
+        history.clear();
         initBoard();
     }
 

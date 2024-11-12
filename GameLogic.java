@@ -38,7 +38,7 @@ public class GameLogic implements PlayableLogic {
             if (lastPlayer != p1) {
                 disc.setOwner(p1);
                 boardDiscs[a.row()][a.col()] = disc;
-                history.add(new Position(a.row(), a.col()));
+                history.addLast(new Position(a.row(), a.col()));
                 System.out.printf("Player 1 placed a %s in (%d,%d)\n", disc.getType(), a.row(), a.col());
                 System.out.println();
                 lastPlayer = p1;
@@ -46,7 +46,7 @@ public class GameLogic implements PlayableLogic {
                 disc.setOwner(p2);
                 boardDiscs[a.row()][a.col()] = disc;
                 System.out.printf("Player 2 placed a %s in (%d,%d)\n", disc.getType(), a.row(), a.col());
-                history.add(new Position(a.row(), a.col()));
+                history.addLast(new Position(a.row(), a.col()));
                 System.out.println();
                 lastPlayer = p2;
             }
@@ -195,14 +195,14 @@ public class GameLogic implements PlayableLogic {
     @Override
     public void undoLastMove() {
         if (!history.isEmpty() && (p1.isHuman() && p2.isHuman())) {
-            int h_row = history.peek().row();
-            int h_col = history.peek().col();
+            int h_row = history.peekLast().row();
+            int h_col = history.peekLast().col();
             //Undo: removing ⬤ from (4, 2)
             //Undo: flipping back ⬤ in (4, 3)
-            System.out.printf("Undo: removing %s from (%d,%d)\n\n",boardDiscs[h_row][h_col].getType(),h_row,h_col);
+            System.out.printf("Undo: removing %s from (%d,%d)\n\n", boardDiscs[h_row][h_col].getType(), h_row, h_col);
             lastPlayer = beforeLastPlayer();
             boardDiscs[h_row][h_col] = null;
-            history.pop();
+            history.removeLast();
 
         }
     }

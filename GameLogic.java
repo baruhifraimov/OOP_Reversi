@@ -1,16 +1,19 @@
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 
 public class GameLogic implements PlayableLogic {
     private final int BOARDSIZE = 8;
     private Player p1, p2;
     private Disc[][] boardDiscs = new Disc[BOARDSIZE][BOARDSIZE]; // Locating disc position on the board
     private Player lastPlayer = getSecondPlayer(); //Checks who was last
-    LinkedList<Position> history = new LinkedList<>(); // Collects all the disc locations on the board
+
+    Stack<Position> history; // Collects all the disc locations on the board
 
     public GameLogic() {
         super();
+        history = new Stack<>();
     }
 
     private Player currentPlayer() {
@@ -255,12 +258,10 @@ public class GameLogic implements PlayableLogic {
                 counter++;
                 m_row += m_row;
                 m_col += m_col;
-            }
-            else if (boardDiscs[a.row() + m_row][a.col() + m_col] != null && boardDiscs[a.row() + m_row][a.col() + m_col].getOwner().equals(currentPlayer())) {
+            } else if (boardDiscs[a.row() + m_row][a.col() + m_col] != null && boardDiscs[a.row() + m_row][a.col() + m_col].getOwner().equals(currentPlayer())) {
                 flipCounter += counter;
                 break;
-            }
-            else{
+            } else {
                 break;
             }
         }
@@ -306,8 +307,8 @@ public class GameLogic implements PlayableLogic {
     @Override
     public void undoLastMove() {
         if (!history.isEmpty() && (p1.isHuman() && p2.isHuman())) {
-            int h_row = history.peekLast().row();
-            int h_col = history.peekLast().col();
+            int h_row = history.peek().row();
+            int h_col = history.peek().col();
             //Undo: removing ⬤ from (4, 2)
             //Undo: flipping back ⬤ in (4, 3)
             System.out.printf("Undo: removing %s from (%d,%d)\n\n", boardDiscs[h_row][h_col].getType(), h_row, h_col);

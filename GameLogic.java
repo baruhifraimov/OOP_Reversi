@@ -240,14 +240,17 @@ public class GameLogic implements PlayableLogic {
         int counter = 0;
         int check_row = a.row() + m_row;
         int check_col = a.col() + m_col;
+
         // Ensure we're within bounds
         if (check_row >= 0 && check_row < BOARDSIZE && check_col >= 0 && check_col < BOARDSIZE) {
-            if (boardDiscs[check_row][check_col] != null && boardDiscs[check_row][check_col].getOwner().equals(lastPlayer)) {
-                // If it's a bomb, recursively explode
-                if (boardDiscs[check_row][check_col].getType().equals("💣") && !boardDiscs[check_row][check_col].bombFlag()) {
-                    boardDiscs[check_row][check_col].set_bombFlag(true);
+            Disc currentDisc = boardDiscs[check_row][check_col];
+            if (currentDisc != null && currentDisc.getOwner().equals(lastPlayer)) {
+                // Handle bomb explosion
+                if (currentDisc.getType().equals("💣") && !currentDisc.bombFlag()) {
+                    currentDisc.set_bombFlag(true); // Mark this bomb as exploded
                     discsFlipStackerCheck.add(new Position(check_row, check_col));
-                    counter++; // Count this bomb
+                    counter++;
+
                     // Recursive explosion
                     counter += explode(new Position(check_row, check_col), +1, 0, discsFlipStackerCheck);
                     counter += explode(new Position(check_row, check_col), -1, 0, discsFlipStackerCheck);
@@ -257,9 +260,9 @@ public class GameLogic implements PlayableLogic {
                     counter += explode(new Position(check_row, check_col), -1, -1, discsFlipStackerCheck);
                     counter += explode(new Position(check_row, check_col), +1, +1, discsFlipStackerCheck);
                     counter += explode(new Position(check_row, check_col), +1, -1, discsFlipStackerCheck);
-                } else if (!boardDiscs[check_row][check_col].bombFlag()) {
-                    // Regular disc, mark as exploded
-                    boardDiscs[check_row][check_col].set_bombFlag(true);
+                } else if (!currentDisc.bombFlag()) {
+                    // Regular disc, mark as flipped
+                    currentDisc.set_bombFlag(true);
                     discsFlipStackerCheck.add(new Position(check_row, check_col));
                     counter++;
                 }

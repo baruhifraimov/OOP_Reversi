@@ -1,6 +1,6 @@
 public class BombDisc implements Disc {
     private Player p;
-    boolean flipped;
+    private boolean flipped,boom = false;
 
     public BombDisc(Player currentPlayer) {
             this.p = currentPlayer;
@@ -12,8 +12,12 @@ public class BombDisc implements Disc {
     }
 
     @Override
-    public boolean beenFlipped() {
-        return flipped;
+    public void set_bombFlag(boolean flag){
+        boom = flag;
+    }
+    @Override
+    public boolean bombFlag(){
+        return boom;
     }
 
     @Override
@@ -22,8 +26,9 @@ public class BombDisc implements Disc {
     }
 
     @Override
-    public void reverseFlipped() {
+    public void reverseFlipped() { //cancels the flip flag that has been set to true
         flipped = false;
+        boom = false;
     }
 
     @Override

@@ -11,8 +11,10 @@ public interface Disc {
      */
     Player getOwner();
 
-    boolean beenFlipped();
+    boolean bombFlag();
+    void set_bombFlag(boolean flag);
     void reverseFlipped();
+
     void setFlipped(boolean flipped);
 
     /**

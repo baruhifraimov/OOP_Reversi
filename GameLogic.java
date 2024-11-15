@@ -68,7 +68,8 @@ public class GameLogic implements PlayableLogic {
                     boardDiscs[a.row()][a.col()] = disc;
                     moveHistory.addLast(new Position(a.row(), a.col()));
                     flipAction(a);
-                    System.out.printf("Player %d placed a %s in (%d,%d)\n No. of Bombs discs left: %d\n", no, disc.getType(), a.row(), a.col(), p1.getNumber_of_bombs());
+                    //System.out.printf("Player %d placed a %s in (%d,%d)\n No. of Bombs discs left: %d\n", no, disc.getType(), a.row(), a.col(), p1.getNumber_of_bombs());
+                    System.out.printf("Player %d placed a %s in (%d,%d)\n", no, disc.getType(), a.row(), a.col());
                     System.out.println();
                     lastPlayer = p;
                 }
@@ -79,7 +80,8 @@ public class GameLogic implements PlayableLogic {
                     boardDiscs[a.row()][a.col()] = disc;
                     moveHistory.addLast(new Position(a.row(), a.col()));
                     flipAction(a);
-                    System.out.printf("Player %d placed a %s in (%d,%d)\n No. of Unflippable discs left: %d\n", no, disc.getType(), a.row(), a.col(), p1.getNumber_of_unflippedable());
+                    //System.out.printf("Player %d placed a %s in (%d,%d)" + "\n No. of Unflippable discs left: %d\n", no, disc.getType(), a.row(), a.col(), p1.getNumber_of_unflippedable());
+                    System.out.printf("Player %d placed a %s in (%d,%d)" + "\n ",no, disc.getType(), a.row(), a.col());
                     System.out.println();
                     lastPlayer = p;
                 }
@@ -164,7 +166,7 @@ public class GameLogic implements PlayableLogic {
         while (!discsFlipStacker.isEmpty()) {
             Position i = discsFlipStacker.peek();
             Disc d = boardDiscs[i.row()][i.col()];
-            if (!d.getOwner().equals(currentPlayer()) && !d.beenFlipped() && !d.getType().equals("⭕")) {
+            if (d!=null && !d.getOwner().equals(currentPlayer()) && !d.getType().equals("⭕")) {
                 d.setOwner(currentPlayer());
                 System.out.printf("Player %s flipped the %s in %s \n", getPlayerNo(currentPlayer()), d.getType(), i);
                 flipHistory.push(d);
@@ -189,25 +191,32 @@ public class GameLogic implements PlayableLogic {
             if (boardDiscs[a.row() + m_row][a.col() + m_col] != null && boardDiscs[a.row() + m_row][a.col() + m_col].getOwner().equals(lastPlayer)) {
                 // check if it can be flipped
                 if (!boardDiscs[a.row() + m_row][a.col() + m_col].getType().equals("⭕")) {
-                    if(boardDiscs[a.row() + m_row][a.col() + m_col].getType().equals("💣")){
-
+                    if(boardDiscs[a.row() + m_row][a.col() + m_col].getType().equals("💣") && !boardDiscs[a.row() + m_row][a.col() + m_col].bombFlag()){
+                        // Bomb position
+                        Position bomb_pos = new Position(a.row() + m_row,a.col() + m_col);
+                        counter+=explode(bomb_pos, +1, 0,discsFlipStackerCheck);
+                        counter+=explode(bomb_pos, -1, 0,discsFlipStackerCheck);
+                        counter+=explode(bomb_pos, 0, -1,discsFlipStackerCheck);
+                        counter+=explode(bomb_pos, 0, +1,discsFlipStackerCheck);
+                        counter+=explode(bomb_pos, -1, +1,discsFlipStackerCheck);
+                        counter+=explode(bomb_pos, -1, -1,discsFlipStackerCheck);
+                        counter+=explode(bomb_pos, +1, +1,discsFlipStackerCheck);
+                        counter+=explode(bomb_pos, +1, -1,discsFlipStackerCheck);
                         // PUT THE EXPLOSION LOGIC THAT ALSO RETURNS HOW MUCH HE CAN EXPLODE
-
                     }
+                    // CHECK IF THE DISC BEEN EXPLODED, DON'T COUNT IT
+                    // ADD FLAG TO DISC THAT TELLS US IF THE DISC EXPLODED
                     else {
-                        counter++;
-                    }
+                        counter++;}
                 }
+
                 //Checks if the player turn is on.
                 if (flip_enabler) {
-                    //checks if the discs been flipped before to prevent from overlapping
-                    if (!boardDiscs[a.row() + m_row][a.col() + m_col].beenFlipped()) {
                         // check if it can be flipped again (double check)
                         if (!boardDiscs[a.row() + m_row][a.col() + m_col].getType().equals("⭕")) {
                             // add to the flip stack if it can be flipped
                             discsFlipStackerCheck.add(new Position(a.row() + m_row, a.col() + m_col));
                         }
-                    }
                 }
             }
             // if no discs left 'and' we got our current player on the other side
@@ -227,11 +236,37 @@ public class GameLogic implements PlayableLogic {
         return flipCounter;
     }
 
-    public void explode(Position a){
-            if (boardDiscs[a.row()][a.col()] != null) {
-
+    public int explode(Position a, int m_row, int m_col, Stack<Position> discsFlipStackerCheck) {
+        int counter = 0;
+        int check_row = a.row() + m_row;
+        int check_col = a.col() + m_col;
+        // Ensure we're within bounds
+        if (check_row >= 0 && check_row < BOARDSIZE && check_col >= 0 && check_col < BOARDSIZE) {
+            if (boardDiscs[check_row][check_col] != null && boardDiscs[check_row][check_col].getOwner().equals(lastPlayer)) {
+                // If it's a bomb, recursively explode
+                if (boardDiscs[check_row][check_col].getType().equals("💣") && !boardDiscs[check_row][check_col].bombFlag()) {
+                    boardDiscs[check_row][check_col].set_bombFlag(true);
+                    discsFlipStackerCheck.add(new Position(check_row, check_col));
+                    counter++; // Count this bomb
+                    // Recursive explosion
+                    counter += explode(new Position(check_row, check_col), +1, 0, discsFlipStackerCheck);
+                    counter += explode(new Position(check_row, check_col), -1, 0, discsFlipStackerCheck);
+                    counter += explode(new Position(check_row, check_col), 0, -1, discsFlipStackerCheck);
+                    counter += explode(new Position(check_row, check_col), 0, +1, discsFlipStackerCheck);
+                    counter += explode(new Position(check_row, check_col), -1, +1, discsFlipStackerCheck);
+                    counter += explode(new Position(check_row, check_col), -1, -1, discsFlipStackerCheck);
+                    counter += explode(new Position(check_row, check_col), +1, +1, discsFlipStackerCheck);
+                    counter += explode(new Position(check_row, check_col), +1, -1, discsFlipStackerCheck);
+                } else if (!boardDiscs[check_row][check_col].bombFlag()) {
+                    // Regular disc, mark as exploded
+                    boardDiscs[check_row][check_col].set_bombFlag(true);
+                    discsFlipStackerCheck.add(new Position(check_row, check_col));
+                    counter++;
+                }
             }
         }
+        return counter;
+    }
 
 
 
@@ -258,6 +293,30 @@ public class GameLogic implements PlayableLogic {
 
     @Override
     public boolean isGameFinished() {
+        int player1_discs=0,player2_discs=0;
+        if (this.ValidMoves().isEmpty())
+        {
+            for (int i = 0; i < BOARDSIZE; i++) {
+                for (int j = 0; j < BOARDSIZE; j++) {
+                    if(boardDiscs[i][j] != null && boardDiscs[i][j].getOwner().equals(p1)){
+                        player1_discs++;
+                    }
+                    else if (boardDiscs[i][j] != null && boardDiscs[i][j].getOwner().equals(p2) ){
+                        player2_discs++;
+                    }
+                }
+            }
+            if(player1_discs>player2_discs){
+                getFirstPlayer().addWin();
+                System.out.printf("Player %s wins with %d discs! Player %s had %d discs.",getPlayerNo(p1),player1_discs,getPlayerNo(p2),player2_discs);
+            }
+            else if(player1_discs<player2_discs){
+                getSecondPlayer().addWin();
+                System.out.printf("Player %s wins with %d discs! Player %s had %d discs.",getPlayerNo(p2),player2_discs,getPlayerNo(p1),player1_discs);
+
+            }
+            return true;
+        }
         return false;
     }
 

@@ -1,6 +1,7 @@
 public class UnflippableDisc implements Disc {
     private Player p;
-    boolean flipped;
+    private final boolean flipped = false;
+    private boolean boom = false;
 
     public UnflippableDisc(Player currentPlayer) {
             this.p = currentPlayer;
@@ -11,25 +12,26 @@ public class UnflippableDisc implements Disc {
         return this.p;
     }
 
-    @Override
-    public boolean beenFlipped() {
-        return flipped;
-    }
 
     @Override
     public void reverseFlipped() {
-        flipped = false;
     }
 
     @Override
-    public void setFlipped(boolean flipped) {
-        this.flipped = flipped;
-    }
+    public void setFlipped(boolean flipped) {}
 
     @Override
     public void setOwner(Player player) {
         this.p = player;
-        flipped = true;
+    }
+
+    @Override
+    public void set_bombFlag(boolean flag){
+        boom = flag;
+    }
+    @Override
+    public boolean bombFlag(){
+        return true;
     }
 
     @Override

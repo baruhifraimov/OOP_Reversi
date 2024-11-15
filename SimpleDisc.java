@@ -1,6 +1,6 @@
 public class SimpleDisc implements Disc {
     private Player p;
-    boolean flipped;
+    private boolean flipped,boom = false;
 
     public SimpleDisc(Player currentPlayer) {
         this.p = currentPlayer;
@@ -11,10 +11,10 @@ public class SimpleDisc implements Disc {
         return this.p;
     }
 
+
     @Override
     public void setOwner(Player player) {
         this.p = player;
-
     }
 
     @Override
@@ -23,13 +23,18 @@ public class SimpleDisc implements Disc {
     }
 
     @Override
-    public boolean beenFlipped() {
-        return flipped;
+    public boolean bombFlag(){
+        return boom;
+    }
+    @Override
+    public void set_bombFlag(boolean flag){
+        boom = flag;
     }
 
     @Override
     public void reverseFlipped(){
         flipped = false;
+        boom = false;
     }
 
     @Override

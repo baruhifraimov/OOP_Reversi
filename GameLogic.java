@@ -194,29 +194,29 @@ public class GameLogic implements PlayableLogic {
                     if(boardDiscs[a.row() + m_row][a.col() + m_col].getType().equals("💣") && !boardDiscs[a.row() + m_row][a.col() + m_col].bombFlag()){
                         // Bomb position
                         Position bomb_pos = new Position(a.row() + m_row,a.col() + m_col);
-                        counter+=explode(bomb_pos, +1, 0,discsFlipStackerCheck);
-                        counter+=explode(bomb_pos, -1, 0,discsFlipStackerCheck);
-                        counter+=explode(bomb_pos, 0, -1,discsFlipStackerCheck);
-                        counter+=explode(bomb_pos, 0, +1,discsFlipStackerCheck);
-                        counter+=explode(bomb_pos, -1, +1,discsFlipStackerCheck);
-                        counter+=explode(bomb_pos, -1, -1,discsFlipStackerCheck);
-                        counter+=explode(bomb_pos, +1, +1,discsFlipStackerCheck);
-                        counter+=explode(bomb_pos, +1, -1,discsFlipStackerCheck);
+                        counter+=count_explode(bomb_pos, +1, 0,discsFlipStackerCheck);
+                        counter+=count_explode(bomb_pos, -1, 0,discsFlipStackerCheck);
+                        counter+=count_explode(bomb_pos, 0, -1,discsFlipStackerCheck);
+                        counter+=count_explode(bomb_pos, 0, +1,discsFlipStackerCheck);
+                        counter+=count_explode(bomb_pos, -1, +1,discsFlipStackerCheck);
+                        counter+=count_explode(bomb_pos, -1, -1,discsFlipStackerCheck);
+                        counter+=count_explode(bomb_pos, +1, +1,discsFlipStackerCheck);
+                        counter+=count_explode(bomb_pos, +1, -1,discsFlipStackerCheck);
+                        counter++; // Count this bomb
                         // PUT THE EXPLOSION LOGIC THAT ALSO RETURNS HOW MUCH HE CAN EXPLODE
                     }
-                    // CHECK IF THE DISC BEEN EXPLODED, DON'T COUNT IT
-                    // ADD FLAG TO DISC THAT TELLS US IF THE DISC EXPLODED
+                    // If no bomb encountered, continue counting
                     else {
-                        counter++;}
+                        counter++;
+                    }
                 }
-
                 //Checks if the player turn is on.
                 if (flip_enabler) {
-                        // check if it can be flipped again (double check)
-                        if (!boardDiscs[a.row() + m_row][a.col() + m_col].getType().equals("⭕")) {
-                            // add to the flip stack if it can be flipped
-                            discsFlipStackerCheck.add(new Position(a.row() + m_row, a.col() + m_col));
-                        }
+                    // check if it can be flipped again (double check)
+                    if (!boardDiscs[a.row() + m_row][a.col() + m_col].getType().equals("⭕")) {
+                        // add to the flip stack if it can be flipped
+                        discsFlipStackerCheck.add(new Position(a.row() + m_row, a.col() + m_col));
+                    }
                 }
             }
             // if no discs left 'and' we got our current player on the other side
@@ -236,27 +236,27 @@ public class GameLogic implements PlayableLogic {
         return flipCounter;
     }
 
-    public int explode(Position a, int m_row, int m_col, Stack<Position> discsFlipStackerCheck) {
+    public int count_explode(Position a, int m_row, int m_col, Stack<Position> discsFlipStackerCheck) {
         int counter = 0;
         int check_row = a.row() + m_row;
         int check_col = a.col() + m_col;
         // Ensure we're within bounds
         if (check_row >= 0 && check_row < BOARDSIZE && check_col >= 0 && check_col < BOARDSIZE) {
+            // Check if the location is occupied by the opponent disc
             if (boardDiscs[check_row][check_col] != null && boardDiscs[check_row][check_col].getOwner().equals(lastPlayer)) {
-                // If it's a bomb, recursively explode
+                // If it's a bomb and haven't executed, recursively explode
                 if (boardDiscs[check_row][check_col].getType().equals("💣") && !boardDiscs[check_row][check_col].bombFlag()) {
                     boardDiscs[check_row][check_col].set_bombFlag(true);
                     discsFlipStackerCheck.add(new Position(check_row, check_col));
-                    counter++; // Count this bomb
                     // Recursive explosion
-                    counter += explode(new Position(check_row, check_col), +1, 0, discsFlipStackerCheck);
-                    counter += explode(new Position(check_row, check_col), -1, 0, discsFlipStackerCheck);
-                    counter += explode(new Position(check_row, check_col), 0, -1, discsFlipStackerCheck);
-                    counter += explode(new Position(check_row, check_col), 0, +1, discsFlipStackerCheck);
-                    counter += explode(new Position(check_row, check_col), -1, +1, discsFlipStackerCheck);
-                    counter += explode(new Position(check_row, check_col), -1, -1, discsFlipStackerCheck);
-                    counter += explode(new Position(check_row, check_col), +1, +1, discsFlipStackerCheck);
-                    counter += explode(new Position(check_row, check_col), +1, -1, discsFlipStackerCheck);
+                    counter += count_explode(new Position(check_row, check_col), +1, 0, discsFlipStackerCheck);
+                    counter += count_explode(new Position(check_row, check_col), -1, 0, discsFlipStackerCheck);
+                    counter += count_explode(new Position(check_row, check_col), 0, -1, discsFlipStackerCheck);
+                    counter += count_explode(new Position(check_row, check_col), 0, +1, discsFlipStackerCheck);
+                    counter += count_explode(new Position(check_row, check_col), -1, +1, discsFlipStackerCheck);
+                    counter += count_explode(new Position(check_row, check_col), -1, -1, discsFlipStackerCheck);
+                    counter += count_explode(new Position(check_row, check_col), +1, +1, discsFlipStackerCheck);
+                    counter += count_explode(new Position(check_row, check_col), +1, -1, discsFlipStackerCheck);
                 } else if (!boardDiscs[check_row][check_col].bombFlag()) {
                     // Regular disc, mark as exploded
                     boardDiscs[check_row][check_col].set_bombFlag(true);

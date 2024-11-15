@@ -14,4 +14,9 @@ public class Position {
     public int col(){
         return this.col;
     }
+
+    @Override
+    public String toString() {
+        return "("+ this.row + "," + this.col+")";
+    }
 }

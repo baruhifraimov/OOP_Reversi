@@ -11,6 +11,10 @@ public interface Disc {
      */
     Player getOwner();
 
+    boolean beenFlipped();
+    void reverseFlipped();
+    void setFlipped(boolean flipped);
+
     /**
      * Set the player who owns the Disc.
      *

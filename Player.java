@@ -73,12 +73,4 @@ public abstract class Player {
         this.number_of_bombs = initial_number_of_bombs;
         this.number_of_unflippedable = initial_number_of_unflippedable;
     }
-
-    @Override
-    public String toString() {
-        if (isPlayerOne) {
-            return "Player 2";
-        }
-        return "Player 1";
-    }
 }

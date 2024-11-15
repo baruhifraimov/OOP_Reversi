@@ -4,14 +4,15 @@ import java.util.Stack;
 
 public class GameLogic implements PlayableLogic {
     private final int BOARDSIZE = 8;
-    private Player p1, p2;
-    private Disc[][] boardDiscs = new Disc[BOARDSIZE][BOARDSIZE]; // Locating disc position on the board
+    private Player p1, p2; // Player's entity
     private Player lastPlayer; //Checks who was last
-    private Stack<Position> discsFlipStacker;
-    private Stack<Disc> flipHistory;
-    private Stack<Integer> undoCountStack;
-    private boolean flip_enabler;
+    private Disc[][] boardDiscs = new Disc[BOARDSIZE][BOARDSIZE]; // Locating disc position on the board
+    private Stack<Position> discsFlipStacker; // Collects data of disc to flip locations
+    private Stack<Position> discsFlipStackerCopy;
     private Stack<Position> moveHistory; // Collects all the disc locations on the board
+    private Stack<Disc> flipHistory; // Collects data of setOwner.
+    private Stack<Integer> undoCountStack; // Collects data how many discs been flipped in each round
+    private boolean flip_enabler; // Flag for enabling collecting data for flipping discs
 
     public GameLogic() {
         super();
@@ -19,6 +20,7 @@ public class GameLogic implements PlayableLogic {
         moveHistory = new Stack<>();
         undoCountStack = new Stack<>();
         discsFlipStacker = new Stack<>();
+        discsFlipStackerCopy = new Stack<>();
         lastPlayer = getSecondPlayer();
     }
 
@@ -29,6 +31,13 @@ public class GameLogic implements PlayableLogic {
         return p1;
     }
 
+    private int getPlayerNo(Player p) {
+        if (p.equals(p1)) {
+            return 1;
+        } else {
+            return 2;
+        }
+    }
 
     private void initBoard() {
         boardDiscs = new Disc[BOARDSIZE][BOARDSIZE];
@@ -41,73 +50,52 @@ public class GameLogic implements PlayableLogic {
 
     @Override
     public boolean locate_disc(Position a, Disc disc) {
+        boolean flag = false;
         if (boardDiscs[a.row()][a.col()] == null && countFlips(a) > 0) {
             flip_enabler = true;// Move is enabled, flag for enabling flipping
-            if (lastPlayer != p1) {
-                flipAction(a);
-                if (disc.getType().equals("💣")) {
-                    if (p1.getNumber_of_bombs() > 0) {
-                        p1.reduce_bomb();
-                        boardDiscs[a.row()][a.col()] = disc;
-                        moveHistory.addLast(new Position(a.row(), a.col()));
-                        System.out.printf("Player 1 placed a %s in (%d,%d)\n No. of Bombs discs left: %d\n", disc.getType(), a.row(), a.col(), p1.getNumber_of_bombs());
-                        System.out.println();
-                        lastPlayer = p1;
-                    }
-                } else if (disc.getType().equals("⭕")) {
-                    if (p1.getNumber_of_unflippedable() > 0) {
-                        p1.reduce_unflippedable();
-                        boardDiscs[a.row()][a.col()] = disc;
-                        moveHistory.addLast(new Position(a.row(), a.col()));
-                        System.out.printf("Player 1 placed a %s in (%d,%d)\n No. of Unflippable discs left: %d\n", disc.getType(), a.row(), a.col(), p1.getNumber_of_unflippedable());
-                        System.out.println();
-                        lastPlayer = p1;
-                    }
-
-                } else if (disc.getType().equals("⬤")) {
-                    boardDiscs[a.row()][a.col()] = disc;
-                    moveHistory.addLast(new Position(a.row(), a.col()));
-                    System.out.printf("Player 1 placed a %s in (%d,%d)\n", disc.getType(), a.row(), a.col());
-                    System.out.println();
-                    lastPlayer = p1;
-                } else {
-                    return false;
-                }
-
-            } else {
-                flipAction(a);
-                if (disc.getType().equals("💣")) {
-                    if (p2.getNumber_of_bombs() >= 0) {
-                        p2.reduce_bomb();
-                        boardDiscs[a.row()][a.col()] = disc;
-                        System.out.printf("Player 2 placed a %s in (%d,%d)\n No. of Bombs discs left: %d\n", disc.getType(), a.row(), a.col(), p2.getNumber_of_bombs());
-                        moveHistory.addLast(new Position(a.row(), a.col()));
-                        System.out.println();
-                        lastPlayer = p2;
-                    }
-                } else if (disc.getType().equals("⭕")) {
-                    if (p2.getNumber_of_unflippedable() >= 0) {
-                        p2.reduce_unflippedable();
-                        boardDiscs[a.row()][a.col()] = disc;
-                        System.out.printf("Player 2 placed a %s in (%d,%d)\n No. of Unflippeable discs left: %d\n", disc.getType(), a.row(), a.col(), p2.getNumber_of_unflippedable());
-                        moveHistory.addLast(new Position(a.row(), a.col()));
-                        System.out.println();
-                        lastPlayer = p2;
-                    }
-
-                } else if (disc.getType().equals("⬤")) {
-                    boardDiscs[a.row()][a.col()] = disc;
-                    System.out.printf("Player 2 placed a %s in (%d,%d)\n", disc.getType(), a.row(), a.col());
-                    moveHistory.addLast(new Position(a.row(), a.col()));
-                    System.out.println();
-                    lastPlayer = p2;
-                } else {
-                    return false;
-                }
-            }
-            return true;
+            flag = aux_locate_disc(disc, a);
         }
-        return false;
+        return flag;
+    }
+
+    private boolean aux_locate_disc(Disc disc, Position a) {
+        Player p = currentPlayer();
+        int no = getPlayerNo(p);
+        switch (disc.getType()) {
+            case "💣":
+                if (p.getNumber_of_bombs() > 0) {
+                    p.reduce_bomb();
+                    boardDiscs[a.row()][a.col()] = disc;
+                    moveHistory.addLast(new Position(a.row(), a.col()));
+                    flipAction(a);
+                    System.out.printf("Player %d placed a %s in (%d,%d)\n No. of Bombs discs left: %d\n", no, disc.getType(), a.row(), a.col(), p1.getNumber_of_bombs());
+                    System.out.println();
+                    lastPlayer = p;
+                }
+                return true;
+            case "⭕":
+                if (p.getNumber_of_unflippedable() > 0) {
+                    p.reduce_unflippedable();
+                    boardDiscs[a.row()][a.col()] = disc;
+                    moveHistory.addLast(new Position(a.row(), a.col()));
+                    flipAction(a);
+                    System.out.printf("Player %d placed a %s in (%d,%d)\n No. of Unflippable discs left: %d\n", no, disc.getType(), a.row(), a.col(), p1.getNumber_of_unflippedable());
+                    System.out.println();
+                    lastPlayer = p;
+                }
+                return true;
+            case "⬤":
+                boardDiscs[a.row()][a.col()] = disc;
+                moveHistory.addLast(new Position(a.row(), a.col()));
+                flipAction(a);
+                System.out.printf("Player %d placed a %s in (%d,%d)\n", no, disc.getType(), a.row(), a.col());
+                System.out.println();
+                lastPlayer = p;
+                return true;
+            default:
+                return false;
+        }
+
     }
 
     @Override
@@ -136,6 +124,7 @@ public class GameLogic implements PlayableLogic {
         return vMoves;
     }
 
+    // Taking position a and spreading checks x,y,z for possible flips
     @Override
     public int countFlips(Position a) {
         int down = auxCountFlips(a, +1, 0);
@@ -156,6 +145,7 @@ public class GameLogic implements PlayableLogic {
         return down + up + left + right + dur + dul + ddr + ddl;
     }
 
+    // same as auxCountFlips but under the control of flipAction for managing conflicts
     public void flipPositionFinder(Position a) {
         auxCountFlips(a, +1, 0);
         auxCountFlips(a, -1, 0);
@@ -167,17 +157,18 @@ public class GameLogic implements PlayableLogic {
         auxCountFlips(a, +1, -1);
     }
 
+    // Here the flip action takes a place, who to flip and how much
     private void flipAction(Position a) {
         int undoCount = 0;
         flipPositionFinder(a);
         while (!discsFlipStacker.isEmpty()) {
             Position i = discsFlipStacker.peek();
             Disc d = boardDiscs[i.row()][i.col()];
-            if (!d.getOwner().equals(currentPlayer()) && !d.beenFlipped()) {
+            if (!d.getOwner().equals(currentPlayer()) && !d.beenFlipped() && !d.getType().equals("⭕")) {
                 d.setOwner(currentPlayer());
-                System.out.printf("Flipped %s\n", i);
+                System.out.printf("Player %s flipped the %s in %s \n", getPlayerNo(currentPlayer()), d.getType(), i);
                 flipHistory.push(d);
-                discsFlipStacker.pop();
+                discsFlipStackerCopy.add(discsFlipStacker.pop());
                 undoCount++;
             } else {
                 discsFlipStacker.pop();
@@ -196,13 +187,19 @@ public class GameLogic implements PlayableLogic {
         while (((a.row() + m_row) < BOARDSIZE) && ((a.row() + m_row) >= 0) && ((a.col() + m_col) < BOARDSIZE) && ((a.col() + m_col) >= 0)) {
             // check if it's not empty and if it's my opponent disc
             if (boardDiscs[a.row() + m_row][a.col() + m_col] != null && boardDiscs[a.row() + m_row][a.col() + m_col].getOwner().equals(lastPlayer)) {
-                counter++;
+                // check if it can be flipped
+                if (!boardDiscs[a.row() + m_row][a.col() + m_col].getType().equals("⭕")) {
+                    counter++;
+                }
                 //Checks if the player turn is on.
                 if (flip_enabler) {
                     //checks if the discs been flipped before to prevent from overlapping
                     if (!boardDiscs[a.row() + m_row][a.col() + m_col].beenFlipped()) {
-                        // add to the flip stack
-                        discsFlipStackerCheck.add(new Position(a.row() + m_row, a.col() + m_col));
+                        // check if it can be flipped again (double check)
+                        if (!boardDiscs[a.row() + m_row][a.col() + m_col].getType().equals("⭕")) {
+                            // add to the flip stack if it can be flipped
+                            discsFlipStackerCheck.add(new Position(a.row() + m_row, a.col() + m_col));
+                        }
                     }
                 }
             }
@@ -260,25 +257,25 @@ public class GameLogic implements PlayableLogic {
         p1.reset_bombs_and_unflippedable();
         p2.reset_bombs_and_unflippedable();
         initBoard();
-        System.out.println("\nTHE GAME HAS INITIALIZED RESET\n\n\n\n\n\n\n\n\n\n ");
     }
 
     @Override
     public void undoLastMove() {
         // Undo Moves
         if (!moveHistory.isEmpty() && (p1.isHuman() && p2.isHuman())) {
+            System.out.println("\nUndoing last move:");
             int h_row = moveHistory.peek().row();
             int h_col = moveHistory.peek().col();
-            System.out.printf("Undo: removing %s from (%d,%d)\n\n", boardDiscs[h_row][h_col].getType(), h_row, h_col);
+            System.out.printf("\tUndo: removing %s from (%d,%d)\n", boardDiscs[h_row][h_col].getType(), h_row, h_col);
             lastPlayer = currentPlayer();
             if (boardDiscs[h_row][h_col].getType().equals("💣")) {
                 boardDiscs[h_row][h_col].getOwner().add_bomb();
-                System.out.printf("Restoring %s Bombs: %d left\n", lastPlayer.toString(), lastPlayer.getNumber_of_bombs());
+                System.out.printf("\tRestoring %s Bombs: %d left\n", getPlayerNo(lastPlayer), lastPlayer.getNumber_of_bombs());
                 boardDiscs[h_row][h_col] = null;
                 moveHistory.removeLast();
             } else if (boardDiscs[h_row][h_col].getType().equals("⭕")) {
                 boardDiscs[h_row][h_col].getOwner().add_unflippedable();
-                System.out.printf("Restoring %s Bombs: %d left", lastPlayer.toString(), lastPlayer.getNumber_of_unflippedable());
+                System.out.printf("\tRestoring %s Bombs: %d left\n", getPlayerNo(lastPlayer), lastPlayer.getNumber_of_unflippedable());
                 boardDiscs[h_row][h_col] = null;
                 moveHistory.removeLast();
             } else {
@@ -288,21 +285,19 @@ public class GameLogic implements PlayableLogic {
 
         }
         // Undo Flips
-        if(!undoCountStack.isEmpty()&& (p1.isHuman() && p2.isHuman())) {
-            System.out.println("COUNT OF UNFLIP: "+undoCountStack.peek());
-            for(int i: undoCountStack){
-                System.out.println(i);
-            }
+        if (!undoCountStack.isEmpty() && (p1.isHuman() && p2.isHuman())) {
             int j = undoCountStack.pop();
-            while (j>0) {
+            while (j > 0) {
                 for (int i = 0; i < j; i++) {
                     if (!flipHistory.isEmpty()) {
+                        Position p = discsFlipStackerCopy.pop();
+                        System.out.printf("\tUndo: flipping back %s in (%d,%d)\n", flipHistory.peek().getType(),p.row(),p.col());
                         flipHistory.pop().setOwner(lastPlayer);
                         j--;
                     }
                 }
             }
-            }
         }
     }
+}
 

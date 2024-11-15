@@ -23,16 +23,16 @@ public class SimpleDisc implements Disc {
     }
 
     @Override
-    public boolean bombFlag(){
+    public boolean flag_bomb(){
         return boom;
     }
     @Override
-    public void set_bombFlag(boolean flag){
+    public void set_flag_bomb(boolean flag){
         boom = flag;
     }
 
     @Override
-    public void reverseFlipped(){
+    public void reset_flags(){
         flipped = false;
         boom = false;
     }

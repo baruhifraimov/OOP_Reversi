@@ -14,7 +14,7 @@ public class UnflippableDisc implements Disc {
 
 
     @Override
-    public void reverseFlipped() {
+    public void reset_flags() {
     }
 
     @Override
@@ -26,11 +26,11 @@ public class UnflippableDisc implements Disc {
     }
 
     @Override
-    public void set_bombFlag(boolean flag){
+    public void set_flag_bomb(boolean flag){
         boom = flag;
     }
     @Override
-    public boolean bombFlag(){
+    public boolean flag_bomb(){
         return true;
     }
 

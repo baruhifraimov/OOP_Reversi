@@ -12,11 +12,11 @@ public class BombDisc implements Disc {
     }
 
     @Override
-    public void set_bombFlag(boolean flag){
+    public void set_flag_bomb(boolean flag){
         boom = flag;
     }
     @Override
-    public boolean bombFlag(){
+    public boolean flag_bomb(){
         return boom;
     }
 
@@ -26,7 +26,7 @@ public class BombDisc implements Disc {
     }
 
     @Override
-    public void reverseFlipped() { //cancels the flip flag that has been set to true
+    public void reset_flags() { //cancels the flip flag that has been set to true
         flipped = false;
         boom = false;
     }

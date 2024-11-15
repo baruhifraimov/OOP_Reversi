@@ -180,7 +180,7 @@ public class GameLogic implements PlayableLogic {
     }
 
     private int auxCountFlips(Position a, int m_row, int m_col) {
-        int counter = 0, flipCounter = 0;
+        int counter = 0, flipCounter = 0,explosion = 0;
         int rep_row = m_row, rep_col = m_col;
         Stack<Position> discsFlipStackerCheck = new Stack<>();
         // scan the whole board
@@ -189,7 +189,14 @@ public class GameLogic implements PlayableLogic {
             if (boardDiscs[a.row() + m_row][a.col() + m_col] != null && boardDiscs[a.row() + m_row][a.col() + m_col].getOwner().equals(lastPlayer)) {
                 // check if it can be flipped
                 if (!boardDiscs[a.row() + m_row][a.col() + m_col].getType().equals("⭕")) {
-                    counter++;
+                    if(boardDiscs[a.row() + m_row][a.col() + m_col].getType().equals("💣")){
+
+                        // PUT THE EXPLOSION LOGIC THAT ALSO RETURNS HOW MUCH HE CAN EXPLODE
+
+                    }
+                    else {
+                        counter++;
+                    }
                 }
                 //Checks if the player turn is on.
                 if (flip_enabler) {
@@ -219,6 +226,13 @@ public class GameLogic implements PlayableLogic {
         }
         return flipCounter;
     }
+
+    public void explode(Position a){
+            if (boardDiscs[a.row()][a.col()] != null) {
+
+            }
+        }
+
 
 
     @Override

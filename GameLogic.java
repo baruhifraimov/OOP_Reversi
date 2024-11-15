@@ -9,6 +9,7 @@ public class GameLogic implements PlayableLogic {
     private Player lastPlayer; //Checks who was last
     private Stack<Position> discsFlipStacker;
     private Stack<Disc> flipHistory;
+    private Stack<Integer> undoCountStack;
     private boolean flip_enabler;
     private Stack<Position> moveHistory; // Collects all the disc locations on the board
 
@@ -16,6 +17,7 @@ public class GameLogic implements PlayableLogic {
         super();
         flipHistory = new Stack<>();
         moveHistory = new Stack<>();
+        undoCountStack = new Stack<>();
         discsFlipStacker = new Stack<>();
         lastPlayer = getSecondPlayer();
     }
@@ -166,6 +168,7 @@ public class GameLogic implements PlayableLogic {
     }
 
     private void flipAction(Position a) {
+        int undoCount = 0;
         flipPositionFinder(a);
         while (!discsFlipStacker.isEmpty()) {
             Position i = discsFlipStacker.peek();
@@ -175,11 +178,14 @@ public class GameLogic implements PlayableLogic {
                 System.out.printf("Flipped %s\n", i);
                 flipHistory.push(d);
                 discsFlipStacker.pop();
+                undoCount++;
             } else {
                 discsFlipStacker.pop();
             }
         }
+        undoCountStack.add(undoCount);
         flip_enabler = false;
+
     }
 
     private int auxCountFlips(Position a, int m_row, int m_col) {
@@ -248,23 +254,22 @@ public class GameLogic implements PlayableLogic {
     public void reset() {
         lastPlayer = p2;
         moveHistory.clear();
+        discsFlipStacker.clear();
+        undoCountStack.clear();
+        flipHistory.clear();
         p1.reset_bombs_and_unflippedable();
         p2.reset_bombs_and_unflippedable();
-        discsFlipStacker.clear();
         initBoard();
         System.out.println("\nTHE GAME HAS INITIALIZED RESET\n\n\n\n\n\n\n\n\n\n ");
     }
 
     @Override
     public void undoLastMove() {
+        // Undo Moves
         if (!moveHistory.isEmpty() && (p1.isHuman() && p2.isHuman())) {
             int h_row = moveHistory.peek().row();
             int h_col = moveHistory.peek().col();
-            //Undo: removing ⬤ from (4, 2)
-            //Undo: flipping back ⬤ in (4, 3)
             System.out.printf("Undo: removing %s from (%d,%d)\n\n", boardDiscs[h_row][h_col].getType(), h_row, h_col);
-            //Undo flip
-            flipHistory.pop().setOwner(currentPlayer());
             lastPlayer = currentPlayer();
             if (boardDiscs[h_row][h_col].getType().equals("💣")) {
                 boardDiscs[h_row][h_col].getOwner().add_bomb();
@@ -282,5 +287,22 @@ public class GameLogic implements PlayableLogic {
             }
 
         }
+        // Undo Flips
+        if(!undoCountStack.isEmpty()&& (p1.isHuman() && p2.isHuman())) {
+            System.out.println("COUNT OF UNFLIP: "+undoCountStack.peek());
+            for(int i: undoCountStack){
+                System.out.println(i);
+            }
+            int j = undoCountStack.pop();
+            while (j>0) {
+                for (int i = 0; i < j; i++) {
+                    if (!flipHistory.isEmpty()) {
+                        flipHistory.pop().setOwner(lastPlayer);
+                        j--;
+                    }
+                }
+            }
+            }
+        }
     }
-}
+

@@ -114,6 +114,7 @@ public class GameLogic implements PlayableLogic {
     //A valid move is one where at least one piece is reversed (flipped over).
     @Override
     public List<Position> ValidMoves() {
+
         List<Position> vMoves = new ArrayList<>();
         for (int i = 0; i < BOARDSIZE; i++) {
             for (int j = 0; j < BOARDSIZE; j++) {
@@ -124,12 +125,14 @@ public class GameLogic implements PlayableLogic {
                 }
             }
         }
+
         return vMoves;
     }
 
     // Taking position a and spreading checks x,y,z for possible flips
     @Override
     public int countFlips(Position a) {
+
         int down = auxCountFlips(a, +1, 0);
         int up = auxCountFlips(a, -1, 0);
         int left = auxCountFlips(a, 0, -1);
@@ -146,6 +149,7 @@ public class GameLogic implements PlayableLogic {
             }
         }
         return down + up + left + right + dur + dul + ddr + ddl;
+
     }
 
 
@@ -206,18 +210,13 @@ public class GameLogic implements PlayableLogic {
 //                        discsFlipStackerCheck.add(new Position(a.row() + m_row, a.col() + m_col));
 //                        Position bomb_pos = new Position(a.row() + m_row, a.col() + m_col);// Bomb position
                         //Check all directions including current position
+                        disc.flag_bomb();
                         counter += count_explode(new Position(a.row() + m_row, a.col() + m_col), 0, 0, discsFlipStackerCheck);
-//                        counter += count_explode(bomb_pos, +1, 0, discsFlipStackerCheck);
-//                        counter += count_explode(bomb_pos, -1, 0, discsFlipStackerCheck);
-//                        counter += count_explode(bomb_pos, 0, -1, discsFlipStackerCheck);
-//                        counter += count_explode(bomb_pos, 0, +1, discsFlipStackerCheck);
-//                        counter += count_explode(bomb_pos, -1, +1, discsFlipStackerCheck);
-//                        counter += count_explode(bomb_pos, -1, -1, discsFlipStackerCheck);
-//                        counter += count_explode(bomb_pos, +1, +1, discsFlipStackerCheck);
-//                        counter += count_explode(bomb_pos, +1, -1, discsFlipStackerCheck);
+//                        System.out.printf("THIS IS COUNTER FOR (%d,%d): %d\n",a.row(),a.row(),counter);
                     }
                     // If no bomb encountered or unflippable disc, continue counting
-                    else {
+                    else if(disc.getType().equals("⬤")) {
+                        disc.flag_bomb();
                         counter++;
                     }
                 }
@@ -248,111 +247,50 @@ public class GameLogic implements PlayableLogic {
     }
 
     public int count_explode(Position bomb_pos, int m_row, int m_col, Stack<Position> discsFlipStackerCheck) {
-        int counter = 0,abaCounter =0;
+        int counter = 0;
         int check_row = bomb_pos.row() + m_row;
         int check_col = bomb_pos.col() + m_col;
 
+        // Ensure we're within bounds
+        if (check_row >= 0 && check_row < BOARDSIZE && check_col >= 0 && check_col < BOARDSIZE) {
+            // Get the disc at the position
+            Disc disc = boardDiscs[check_row][check_col];
 
+            // Check if there's a disc and it's owned by the opponent
+            if (disc != null && disc.getOwner().equals(lastPlayer)) {
+                // If it's a bomb and not yet processed
+                if (disc.getType().equals("💣") && !disc.flag_bomb()) {
+                    disc.set_flag_bomb(true); // Mark the bomb as processed
+                    counter++; // Count the bomb itself
 
-        // Check bounds
-        if (check_row < 0 || check_row >= BOARDSIZE || check_col < 0 || check_col >= BOARDSIZE) {
-            return 0;
-        }
+                    if (flip_enabler) {
+                        discsFlipStackerCheck.add(new Position(check_row, check_col));
+                    }
 
-        // If already flagged as exploded, skip further processing
-        if (boardDiscs[check_row][check_col] != null && boardDiscs[check_row][check_col].flag_bomb()) {
-            return 0;
-        }
-
-        // Check if the location is occupied by the opponent disc
-        if (boardDiscs[check_row][check_col] != null && boardDiscs[check_row][check_col].getOwner().equals(lastPlayer)) {
-            // If it's a bomb that hasn't been exploded yet
-            if (boardDiscs[check_row][check_col].getType().equals("💣") && !boardDiscs[check_row][check_col].flag_bomb()) {
-
-                boardDiscs[check_row][check_col].set_flag_bomb(true); // Mark the bomb as exploded
-                if (flip_enabler) {counter++;
-                    System.out.println(boardDiscs[check_row][check_col].getType());
-                    discsFlipStackerCheck.add(new Position(check_row, check_col));
+                    // Trigger recursive explosions in all directions
+                    counter += count_explode(new Position(check_row, check_col), +1, 0, discsFlipStackerCheck);
+                    counter += count_explode(new Position(check_row, check_col), -1, 0, discsFlipStackerCheck);
+                    counter += count_explode(new Position(check_row, check_col), 0, +1, discsFlipStackerCheck);
+                    counter += count_explode(new Position(check_row, check_col), 0, -1, discsFlipStackerCheck);
+                    counter += count_explode(new Position(check_row, check_col), +1, +1, discsFlipStackerCheck);
+                    counter += count_explode(new Position(check_row, check_col), +1, -1, discsFlipStackerCheck);
+                    counter += count_explode(new Position(check_row, check_col), -1, +1, discsFlipStackerCheck);
+                    counter += count_explode(new Position(check_row, check_col), -1, -1, discsFlipStackerCheck);
                 }
-                // Recursive explosion in all directions
+                // If it's a regular disc and not yet processed
+                else if (!disc.flag_bomb() && !disc.getType().equals("⭕")) {
+                    disc.set_flag_bomb(true); // Mark the disc as processed
+                    counter++; // Count the disc
 
-                //THIS IS THE PROBLEMATIC SCENE, NEED TO GET FIXED
-                //THIS IS THE PROBLEMATIC SCENE, NEED TO GET FIXED
-                //THIS IS THE PROBLEMATIC SCENE, NEED TO GET FIXED
-                //THIS IS THE PROBLEMATIC SCENE, NEED TO GET FIXED
-                counter += count_explode(new Position(check_row, check_col), +1, 0, discsFlipStackerCheck);
-                counter += count_explode(new Position(check_row, check_col), -1, 0, discsFlipStackerCheck);
-                counter += count_explode(new Position(check_row, check_col), 0, -1, discsFlipStackerCheck);
-                counter += count_explode(new Position(check_row, check_col), 0, +1, discsFlipStackerCheck);
-                counter += count_explode(new Position(check_row, check_col), -1, +1, discsFlipStackerCheck);
-                counter += count_explode(new Position(check_row, check_col), -1, -1, discsFlipStackerCheck);
-                counter += count_explode(new Position(check_row, check_col), +1, +1, discsFlipStackerCheck);
-                counter += count_explode(new Position(check_row, check_col), +1, -1, discsFlipStackerCheck);
-//                System.out.printf("\n\tDOWN:%d UP:%d LEFT:%d RIGHT:%d DUR:%d DUL:%d DDR:%d DDL:%d\n ", down, up, left, right, dur,dul, ddr, ddl);
-
-            }
-            // If it's a regular disc
-             else if (boardDiscs[check_row][check_col] !=null && !boardDiscs[check_row][check_col].getType().equals("⭕") && !boardDiscs[check_row][check_col].flag_bomb()) {
-                counter++;
-                boardDiscs[check_row][check_col].set_flag_bomb(true); // Mark the disc as exploded
-                if (flip_enabler) {
-                    System.out.println(boardDiscs[check_row][check_col].getType());
-                    discsFlipStackerCheck.add(new Position(check_row, check_col));
+                    if (flip_enabler) {
+                        discsFlipStackerCheck.add(new Position(check_row, check_col));
+                    }
                 }
             }
-
-            return counter;
         }
-
-
-        return 0;
+        return counter;
     }
 
-
-//    public int count_explode(Position bomb_pos, int m_row, int m_col, Stack<Position> discsFlipStackerCheck) {
-//        int counter = 0;
-//        int check_row = bomb_pos.row() + m_row;
-//        int check_col = bomb_pos.col() + m_col;
-//        // Ensure we're within bounds
-//        if (check_row >= 0 && check_row < BOARDSIZE && check_col >= 0 && check_col < BOARDSIZE) {
-//            // Check if the location is occupied by the opponent disc
-//            if (boardDiscs[check_row][check_col] != null && boardDiscs[check_row][check_col].getOwner().equals(lastPlayer)) {
-//                // If it's a bomb and haven't executed, add and execute
-//                if (boardDiscs[check_row][check_col].getType().equals("💣") && !boardDiscs[check_row][check_col].flag_bomb()) {
-//                    counter++;
-//                    boardDiscs[check_row][check_col].set_flag_bomb(true);
-//                    if (flip_enabler) {
-//                        discsFlipStackerCheck.add(new Position(check_row, check_col));
-//                    }
-//                    // Recursive explosion
-//                    //counter += count_explode(new Position(check_row, check_col), 0, 0, discsFlipStackerCheck);
-//                    counter += count_explode(new Position(check_row, check_col), +1, 0, discsFlipStackerCheck);
-//                    counter += count_explode(new Position(check_row, check_col), -1, 0, discsFlipStackerCheck);
-//                    counter += count_explode(new Position(check_row, check_col), 0, -1, discsFlipStackerCheck);
-//                    counter += count_explode(new Position(check_row, check_col), 0, +1, discsFlipStackerCheck);
-//                    counter += count_explode(new Position(check_row, check_col), -1, +1, discsFlipStackerCheck);
-//                    counter += count_explode(new Position(check_row, check_col), -1, -1, discsFlipStackerCheck);
-//                    counter += count_explode(new Position(check_row, check_col), +1, +1, discsFlipStackerCheck);
-//                    counter += count_explode(new Position(check_row, check_col), +1, -1, discsFlipStackerCheck);
-//                }
-//                // If it's a simple disc, check if it's the opponent and flag it as exploded
-//                else if (!boardDiscs[check_row][check_col].flag_bomb() && boardDiscs[check_row][check_col].getOwner().equals(lastPlayer)) {
-//                    // Regular disc, mark as exploded
-//                    if (!boardDiscs[check_row][check_col].getType().equals("⭕")) {
-//                        counter++;
-//                        boardDiscs[check_row][check_col].set_flag_bomb(true);
-//                        if (flip_enabler) {
-//
-//                            discsFlipStackerCheck.add(new Position(check_row, check_col));
-//
-//                        }
-//                    }
-//                }
-//            }
-//            return counter;
-//        }
-//        return 0;
-//    }
 
 
     @Override

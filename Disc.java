@@ -11,7 +11,7 @@ public interface Disc {
      */
     Player getOwner();
 
-    boolean flag_bomb();
+    boolean get_flag_bomb();
     void set_flag_bomb(boolean flag);
     void reset_flags();
 

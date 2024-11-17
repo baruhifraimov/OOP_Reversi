@@ -7,12 +7,13 @@ public class GameLogic implements PlayableLogic {
     private Player p1, p2; // Player's entity
     private Player lastPlayer; //Checks who was last
     private Disc[][] boardDiscs = new Disc[BOARDSIZE][BOARDSIZE]; // Locating disc position on the board
-    private Stack<Position> discsFlipStacker; // Collects data of disc to flip locations
-    private Stack<Position> discsFlipStackerCopy;
-    private Stack<Position> moveHistory; // Collects all the disc locations on the board
-    private Stack<Disc> flipHistory; // Collects data of setOwner.
-    private Stack<Integer> undoCountStack; // Collects data how many discs been flipped in each round
+    private final Stack<Position> discsFlipStacker; // Collects data of disc to flip locations
+    private final Stack<Position> discsFlipStackerCopy;
+    private final Stack<Position> moveHistory; // Collects all the disc locations on the board
+    private final Stack<Disc> flipHistory; // Collects data of setOwner.
+    private final Stack<Integer> undoCountStack; // Collects data how many discs been flipped in each round
     private boolean flip_enabler; // Flag for enabling collecting data for flipping discs
+
 
     public GameLogic() {
         super();
@@ -141,13 +142,6 @@ public class GameLogic implements PlayableLogic {
         int dul = auxCountFlips(a, -1, -1);
         int ddr = auxCountFlips(a, +1, +1);
         int ddl = auxCountFlips(a, +1, -1);
-        for (int i = 0; i < BOARDSIZE; i++) {
-            for (int j = 0; j < BOARDSIZE; j++) {
-                if (boardDiscs[i][j] != null) {
-                    boardDiscs[i][j].reset_flags();
-                }
-            }
-        }
         return down + up + left + right + dur + dul + ddr + ddl;
 
     }
@@ -203,20 +197,24 @@ public class GameLogic implements PlayableLogic {
                 if (!disc.getType().equals("⭕")) {
 
 
-//                    if(boardDiscs[a.row() + m_row][a.col() + m_col].getType().equals("💣") && !boardDiscs[a.row() + m_row][a.col() + m_col].flag_bomb()){
-                    //DOR DOR DOR I REMOVED THE .flag_bomb() CHECK STATEMENT HERE AND THE BOMB LOGIC WORKS, ONLY LEFT IS THE COUNTERS FIX
+//                    if(boardDiscs[a.row() + m_row][a.col() + m_col].getType().equals("💣") && !boardDiscs[a.row() + m_row][a.col() + m_col].get_flag_bomb()){
+                    //DOR DOR DOR I REMOVED THE .get_flag_bomb() CHECK STATEMENT HERE AND THE BOMB LOGIC WORKS, ONLY LEFT IS THE COUNTERS FIX
                     if (disc.getType().equals("💣")) {
 //                        counter++; // Count this bomb
 //                        discsFlipStackerCheck.add(new Position(a.row() + m_row, a.col() + m_col));
 //                        Position bomb_pos = new Position(a.row() + m_row, a.col() + m_col);// Bomb position
                         //Check all directions including current position
-                        disc.flag_bomb();
                         counter += count_explode(new Position(a.row() + m_row, a.col() + m_col), 0, 0, discsFlipStackerCheck);
+
+                        //Reset the flags for the explosions, we already counted every possible flip
+                        flagReset();
 //                        System.out.printf("THIS IS COUNTER FOR (%d,%d): %d\n",a.row(),a.row(),counter);
+
                     }
                     // If no bomb encountered or unflippable disc, continue counting
-                    else if(disc.getType().equals("⬤")) {
-                        disc.flag_bomb();
+                    else if (disc.getType().equals("⬤")) {
+//                        disc.set_flag_bomb(true);
+                        //THE PROBLEM OF OVER COUNTING IS HERE
                         counter++;
                     }
                 }
@@ -246,6 +244,16 @@ public class GameLogic implements PlayableLogic {
         return flipCounter;
     }
 
+    private void flagReset(){
+        for (int i = 0; i < BOARDSIZE; i++) {
+            for (int j = 0; j < BOARDSIZE; j++) {
+                if (boardDiscs[i][j] != null) {
+                    boardDiscs[i][j].reset_flags();
+                }
+            }
+        }
+    }
+
     public int count_explode(Position bomb_pos, int m_row, int m_col, Stack<Position> discsFlipStackerCheck) {
         int counter = 0;
         int check_row = bomb_pos.row() + m_row;
@@ -259,7 +267,7 @@ public class GameLogic implements PlayableLogic {
             // Check if there's a disc and it's owned by the opponent
             if (disc != null && disc.getOwner().equals(lastPlayer)) {
                 // If it's a bomb and not yet processed
-                if (disc.getType().equals("💣") && !disc.flag_bomb()) {
+                if (disc.getType().equals("💣") && !disc.get_flag_bomb()) {
                     disc.set_flag_bomb(true); // Mark the bomb as processed
                     counter++; // Count the bomb itself
 
@@ -278,10 +286,9 @@ public class GameLogic implements PlayableLogic {
                     counter += count_explode(new Position(check_row, check_col), -1, -1, discsFlipStackerCheck);
                 }
                 // If it's a regular disc and not yet processed
-                else if (!disc.flag_bomb() && !disc.getType().equals("⭕")) {
+                else if (!disc.get_flag_bomb() && !disc.getType().equals("⭕")) {
                     disc.set_flag_bomb(true); // Mark the disc as processed
                     counter++; // Count the disc
-
                     if (flip_enabler) {
                         discsFlipStackerCheck.add(new Position(check_row, check_col));
                     }
@@ -290,7 +297,6 @@ public class GameLogic implements PlayableLogic {
         }
         return counter;
     }
-
 
 
     @Override

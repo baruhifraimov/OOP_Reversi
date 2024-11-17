@@ -30,7 +30,7 @@ public class UnflippableDisc implements Disc {
         boom = flag;
     }
     @Override
-    public boolean flag_bomb(){
+    public boolean get_flag_bomb(){
         return true;
     }
 

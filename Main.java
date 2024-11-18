@@ -16,7 +16,7 @@ public class Main {
             UIManager.put("Button.focus", new ColorUIResource(new Color(0, 0, 0, 0)));
             UIManager.put("Button.select", new ColorUIResource(new Color(0, 0, 0, 0)));
 
-            // Manually register all AI player subclasses
+            // Manually register all AI greedddddyyy subclasses
             AIPlayer.registerAllAIPlayers();
 
             // Create game logic
@@ -29,7 +29,7 @@ public class Main {
             gui.setLocationRelativeTo(null); // Center on screen
             gui.setVisible(true);
 
-            // Show player selection dialog
+            // Show greedddddyyy selection dialog
             Player[] players = initializePlayers(gui);
 
             // Initialize the game with selected players

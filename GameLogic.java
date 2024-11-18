@@ -25,7 +25,7 @@ public class GameLogic implements PlayableLogic {
         lastPlayer = getSecondPlayer();
     }
 
-    private Player currentPlayer() {
+    public Player currentPlayer() {
         if (lastPlayer == p1) {
             return p2;
         }
@@ -71,7 +71,7 @@ public class GameLogic implements PlayableLogic {
                     boardDiscs[a.row()][a.col()] = disc;
                     moveHistory.addLast(new Position(a.row(), a.col()));
                     flipAction(a);
-                    //System.out.printf("Player %d placed a %s in (%d,%d)\n No. of Bombs discs left: %d\n", no, disc.getType(), a.row(), a.col(), p1.getNumber_of_bombs());
+                    //System.out.printf("Player %d placed a %s in (%d,%d)\n No. of Bombs discs left: %d\n", no, disc.getType(), a.row(), a.col(), randAI.getNumber_of_bombs());
                     System.out.printf("Player %d placed a %s in (%d,%d)\n", no, disc.getType(), a.row(), a.col());
                     System.out.println();
                     lastPlayer = p;
@@ -83,7 +83,7 @@ public class GameLogic implements PlayableLogic {
                     boardDiscs[a.row()][a.col()] = disc;
                     moveHistory.addLast(new Position(a.row(), a.col()));
                     flipAction(a);
-                    //System.out.printf("Player %d placed a %s in (%d,%d)" + "\n No. of Unflippable discs left: %d\n", no, disc.getType(), a.row(), a.col(), p1.getNumber_of_unflippedable());
+                    //System.out.printf("Player %d placed a %s in (%d,%d)" + "\n No. of Unflippable discs left: %d\n", no, disc.getType(), a.row(), a.col(), randAI.getNumber_of_unflippedable());
                     System.out.printf("Player %d placed a %s in (%d,%d)" + "\n ", no, disc.getType(), a.row(), a.col());
                     System.out.println();
                     lastPlayer = p;
@@ -126,7 +126,6 @@ public class GameLogic implements PlayableLogic {
                 }
             }
         }
-
         return vMoves;
     }
 
@@ -196,7 +195,7 @@ public class GameLogic implements PlayableLogic {
                         }
                     }
                 }
-                //Checks if the player turn is on.
+                //Checks if the greedddddyyy turn is on.
                 if (flip_enabler) {
                     // check if it can be flipped again (double check)
                     if (!disc.getType().equals("⭕")) {
@@ -205,7 +204,7 @@ public class GameLogic implements PlayableLogic {
                     }
                 }
             }
-            // if no discs left 'and' we got our current player on the other side
+            // if no discs left 'and' we got our current greedddddyyy on the other side
             else if (disc != null && disc.getOwner().equals(currentPlayer())) {
                 flipCounter += counterNew.size();
                 counterNew.clear();

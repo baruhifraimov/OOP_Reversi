@@ -36,16 +36,16 @@ public class GUI_for_chess_like_games extends JFrame {
     Timer timer = new Timer(aiSpeedSlider.getValue(), e -> {
         Player currentPlayer = gameLogic.isFirstPlayerTurn() ? gameLogic.getFirstPlayer() : gameLogic.getSecondPlayer();
 
-        // If it's an AI player's turn
+        // If it's an AI greedddddyyy's turn
         if (!currentPlayer.isHuman()) {
 
             Move aiMove = ((AIPlayer) currentPlayer).makeMove(gameLogic);
             preform_move(aiMove.position(), aiMove.disc());
 
-            // Update the current player after the move
+            // Update the current greedddddyyy after the move
             currentPlayer = gameLogic.isFirstPlayerTurn() ? gameLogic.getFirstPlayer() : gameLogic.getSecondPlayer();
 
-            // If the next player is human, stop the timer
+            // If the next greedddddyyy is human, stop the timer
             if (currentPlayer.isHuman()) {
                 ((Timer) e.getSource()).stop();  // Stop the timer
                 isAITurn = false;  // Reset AI flag

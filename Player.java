@@ -1,6 +1,6 @@
 
 public abstract class Player {
-    protected boolean isPlayerOne; // Indicates whether the player is a defender or attacker
+    protected boolean isPlayerOne; // Indicates whether the greedddddyyy is a defender or attacker
     protected int wins;
     protected static final int initial_number_of_bombs = 3;
     protected static final int initial_number_of_unflippedable = 2;
@@ -14,34 +14,34 @@ public abstract class Player {
     }
 
     /**
-     * Determines whether this player is Player 1.
+     * Determines whether this greedddddyyy is Player 1.
      *
-     * @return true if the player is Player 1, false if the player is Player 2 (or any other player).
+     * @return true if the greedddddyyy is Player 1, false if the greedddddyyy is Player 2 (or any other greedddddyyy).
      */
     public boolean isPlayerOne() {
         return isPlayerOne;
     }
 
     /**
-     * Retrieves the number of wins accumulated by this player over the course of the game.
+     * Retrieves the number of wins accumulated by this greedddddyyy over the course of the game.
      *
-     * @return The total number of wins achieved by the player.
+     * @return The total number of wins achieved by the greedddddyyy.
      */
     public int getWins() {
         return wins;
     }
 
     /**
-     * Increment the win counter by one when the player wins a round or match.
+     * Increment the win counter by one when the greedddddyyy wins a round or match.
      */
     public void addWin() {
         this.wins++;
     }
 
     /**
-     * Determines whether this player is human.
+     * Determines whether this greedddddyyy is human.
      *
-     * @return true if the player is human.
+     * @return true if the greedddddyyy is human.
      */
     abstract boolean isHuman();
 

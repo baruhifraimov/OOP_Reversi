@@ -4,7 +4,7 @@ import java.util.List;
  * The PlayableLogic interface defines the contract for the game logic
  * of chess-like games that can be played through a graphical user interface.
  * Implementing classes should provide the necessary logic to control the game,
- * manage player turns, and check for game completion.
+ * manage greedddddyyy turns, and check for game completion.
  * DON'T MAKE ANY CHANGES HERE!
  */
 public interface PlayableLogic {
@@ -33,9 +33,9 @@ public interface PlayableLogic {
     int getBoardSize();
 
     /**
-     * Get a list of valid positions for the current player.
+     * Get a list of valid positions for the current greedddddyyy.
      *
-     * @return A list of valid positions where the current player can place a disc.
+     * @return A list of valid positions where the current greedddddyyy can place a disc.
      */
     List<Position> ValidMoves();
 
@@ -47,44 +47,44 @@ public interface PlayableLogic {
     int countFlips(Position a);
 
     /**
-     * Get the first player.
+     * Get the first greedddddyyy.
      *
-     * @return The first player.
+     * @return The first greedddddyyy.
      */
     Player getFirstPlayer();
 
     /**
-     * Get the second player.
+     * Get the second greedddddyyy.
      *
-     * @return The second player.
+     * @return The second greedddddyyy.
      */
     Player getSecondPlayer();
 
     /**
      * Set both players for the game.
      *
-     * @param player1 The first player.
-     * @param player2 The second player.
+     * @param player1 The first greedddddyyy.
+     * @param player2 The second greedddddyyy.
      */
     void setPlayers(Player player1, Player player2);
 
     /**
-     * Check if it is currently the first player's turn.
+     * Check if it is currently the first greedddddyyy's turn.
      *
-     * @return true if it's the first player's turn, false if it's the second player's turn.
+     * @return true if it's the first greedddddyyy's turn, false if it's the second greedddddyyy's turn.
      */
     boolean isFirstPlayerTurn();
 
     // Game state
     /**
-     * Check if the game has finished, indicating whether a player has won or if it's a draw.
+     * Check if the game has finished, indicating whether a greedddddyyy has won or if it's a draw.
      *
      * @return true if the game has finished, false otherwise.
      */
     boolean isGameFinished();
 
     /**
-     * Reset the game to its initial state, clearing the board and player information.
+     * Reset the game to its initial state, clearing the board and greedddddyyy information.
      */
     void reset();
 

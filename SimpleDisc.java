@@ -32,7 +32,10 @@ public class SimpleDisc implements Disc {
     }
 
     public void set_simple_flag_bomb(boolean flag){
-
+        simple_flag_bomb =flag;
+    }
+    public boolean get_simple_flag_bomb(){
+        return simple_flag_bomb;
     }
 
     @Override

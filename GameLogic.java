@@ -1,18 +1,20 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 public class GameLogic implements PlayableLogic {
     private final int BOARDSIZE = 8;
     private Player p1, p2; // Player's entity
     private Player lastPlayer; //Checks who was last
     private Disc[][] boardDiscs = new Disc[BOARDSIZE][BOARDSIZE]; // Locating disc position on the board
+    private boolean flip_enabler; // Flag for enabling collecting data for flipping discs
+
+
     private final Stack<Position> discsFlipStacker; // Collects data of disc to flip locations
     private final Stack<Position> discsFlipStackerCopy;
     private final Stack<Position> moveHistory; // Collects all the disc locations on the board
     private final Stack<Disc> flipHistory; // Collects data of setOwner.
     private final Stack<Integer> undoCountStack; // Collects data how many discs been flipped in each round
-    private boolean flip_enabler; // Flag for enabling collecting data for flipping discs
+
+    Stack<Disc> debug = new Stack<>();
 
 
     public GameLogic() {
@@ -51,6 +53,7 @@ public class GameLogic implements PlayableLogic {
 
     @Override
     public boolean locate_disc(Position a, Disc disc) {
+
         boolean flag = false;
         if (boardDiscs[a.row()][a.col()] == null && countFlips(a) > 0) {
             flip_enabler = true;// Move is enabled, flag for enabling flipping
@@ -61,6 +64,7 @@ public class GameLogic implements PlayableLogic {
     }
 
     private boolean aux_locate_disc(Disc disc, Position a) {
+
         Player p = currentPlayer();
         int no = getPlayerNo(p);
         switch (disc.getType()) {
@@ -116,6 +120,7 @@ public class GameLogic implements PlayableLogic {
     @Override
     public List<Position> ValidMoves() {
 
+
         List<Position> vMoves = new ArrayList<>();
         for (int i = 0; i < BOARDSIZE; i++) {
             for (int j = 0; j < BOARDSIZE; j++) {
@@ -142,6 +147,8 @@ public class GameLogic implements PlayableLogic {
         int dul = auxCountFlips(a, -1, -1);
         int ddr = auxCountFlips(a, +1, +1);
         int ddl = auxCountFlips(a, +1, -1);
+
+
         return down + up + left + right + dur + dul + ddr + ddl;
 
     }
@@ -149,6 +156,7 @@ public class GameLogic implements PlayableLogic {
 
     // same as auxCountFlips but under the control of flipAction for managing conflicts
     public void flipPositionFinder(Position a) {
+
         auxCountFlips(a, +1, 0);
         auxCountFlips(a, -1, 0);
         auxCountFlips(a, 0, -1);
@@ -185,9 +193,11 @@ public class GameLogic implements PlayableLogic {
     }
 
     private int auxCountFlips(Position a, int m_row, int m_col) {
+
         int counter = 0, flipCounter = 0;
         int rep_row = m_row, rep_col = m_col;
         Stack<Position> discsFlipStackerCheck = new Stack<>();
+        ArrayList<Position> counterNew = new ArrayList<>();
         // scan the whole board
         while (((a.row() + m_row) < BOARDSIZE) && ((a.row() + m_row) >= 0) && ((a.col() + m_col) < BOARDSIZE) && ((a.col() + m_col) >= 0)) {
             Disc disc = boardDiscs[a.row() + m_row][a.col() + m_col];
@@ -195,27 +205,20 @@ public class GameLogic implements PlayableLogic {
             if (disc != null && disc.getOwner().equals(lastPlayer)) {
                 // check if it can be flipped
                 if (!disc.getType().equals("⭕")) {
-
-
-//                    if(boardDiscs[a.row() + m_row][a.col() + m_col].getType().equals("💣") && !boardDiscs[a.row() + m_row][a.col() + m_col].get_flag_bomb()){
-                    //DOR DOR DOR I REMOVED THE .get_flag_bomb() CHECK STATEMENT HERE AND THE BOMB LOGIC WORKS, ONLY LEFT IS THE COUNTERS FIX
+                    // if it's a bomb go to explode counter
                     if (disc.getType().equals("💣")) {
-//                        counter++; // Count this bomb
-//                        discsFlipStackerCheck.add(new Position(a.row() + m_row, a.col() + m_col));
-//                        Position bomb_pos = new Position(a.row() + m_row, a.col() + m_col);// Bomb position
                         //Check all directions including current position
-                        counter += count_explode(new Position(a.row() + m_row, a.col() + m_col), 0, 0, discsFlipStackerCheck);
-
+                        counter += count_explode(new Position(a.row() + m_row, a.col() + m_col), 0, 0, discsFlipStackerCheck, counterNew);
                         //Reset the flags for the explosions, we already counted every possible flip
                         flagReset();
-//                        System.out.printf("THIS IS COUNTER FOR (%d,%d): %d\n",a.row(),a.row(),counter);
-
                     }
                     // If no bomb encountered or unflippable disc, continue counting
-                    else if (disc.getType().equals("⬤")) {
-//                        disc.set_flag_bomb(true);
+                    else if (disc.getType().equals("⬤") && !disc.get_flag_bomb()) {
+                        if(!counterNew.contains(new Position(a.row() + m_row, a.col() + m_col))) {
+                            counterNew.add(new Position(a.row() + m_row, a.col() + m_col));
+                        }
                         //THE PROBLEM OF OVER COUNTING IS HERE
-                        counter++;
+                        //counter++;
                     }
                 }
                 //Checks if the player turn is on.
@@ -229,12 +232,16 @@ public class GameLogic implements PlayableLogic {
             }
             // if no discs left 'and' we got our current player on the other side
             else if (disc != null && disc.getOwner().equals(currentPlayer())) {
-                flipCounter += counter;
+                flipCounter += counterNew.size();
+                counterNew.clear();
+                //flipCounter += counter;
                 while (!discsFlipStackerCheck.isEmpty()) {
                     discsFlipStacker.add(discsFlipStackerCheck.pop());
                 }
+
                 break;
             } else {
+
                 discsFlipStackerCheck.clear();
                 break;
             }
@@ -244,17 +251,7 @@ public class GameLogic implements PlayableLogic {
         return flipCounter;
     }
 
-    private void flagReset(){
-        for (int i = 0; i < BOARDSIZE; i++) {
-            for (int j = 0; j < BOARDSIZE; j++) {
-                if (boardDiscs[i][j] != null) {
-                    boardDiscs[i][j].reset_flags();
-                }
-            }
-        }
-    }
-
-    public int count_explode(Position bomb_pos, int m_row, int m_col, Stack<Position> discsFlipStackerCheck) {
+    public int count_explode(Position bomb_pos, int m_row, int m_col, Stack<Position> discsFlipStackerCheck, ArrayList<Position> counterNew) {
         int counter = 0;
         int check_row = bomb_pos.row() + m_row;
         int check_col = bomb_pos.col() + m_col;
@@ -268,6 +265,9 @@ public class GameLogic implements PlayableLogic {
             if (disc != null && disc.getOwner().equals(lastPlayer)) {
                 // If it's a bomb and not yet processed
                 if (disc.getType().equals("💣") && !disc.get_flag_bomb()) {
+                    if(!counterNew.contains(new Position(check_row, check_col))) {
+                        counterNew.add(new Position(check_row, check_col));
+                    }
                     disc.set_flag_bomb(true); // Mark the bomb as processed
                     counter++; // Count the bomb itself
 
@@ -276,18 +276,21 @@ public class GameLogic implements PlayableLogic {
                     }
 
                     // Trigger recursive explosions in all directions
-                    counter += count_explode(new Position(check_row, check_col), +1, 0, discsFlipStackerCheck);
-                    counter += count_explode(new Position(check_row, check_col), -1, 0, discsFlipStackerCheck);
-                    counter += count_explode(new Position(check_row, check_col), 0, +1, discsFlipStackerCheck);
-                    counter += count_explode(new Position(check_row, check_col), 0, -1, discsFlipStackerCheck);
-                    counter += count_explode(new Position(check_row, check_col), +1, +1, discsFlipStackerCheck);
-                    counter += count_explode(new Position(check_row, check_col), +1, -1, discsFlipStackerCheck);
-                    counter += count_explode(new Position(check_row, check_col), -1, +1, discsFlipStackerCheck);
-                    counter += count_explode(new Position(check_row, check_col), -1, -1, discsFlipStackerCheck);
+                    counter += count_explode(new Position(check_row, check_col), +1, 0, discsFlipStackerCheck,counterNew);
+                    counter += count_explode(new Position(check_row, check_col), -1, 0, discsFlipStackerCheck,counterNew);
+                    counter += count_explode(new Position(check_row, check_col), 0, +1, discsFlipStackerCheck,counterNew);
+                    counter += count_explode(new Position(check_row, check_col), 0, -1, discsFlipStackerCheck,counterNew);
+                    counter += count_explode(new Position(check_row, check_col), +1, +1, discsFlipStackerCheck,counterNew);
+                    counter += count_explode(new Position(check_row, check_col), +1, -1, discsFlipStackerCheck,counterNew);
+                    counter += count_explode(new Position(check_row, check_col), -1, +1, discsFlipStackerCheck,counterNew);
+                    counter += count_explode(new Position(check_row, check_col), -1, -1, discsFlipStackerCheck,counterNew);
                 }
                 // If it's a regular disc and not yet processed
-                else if (!disc.get_flag_bomb() && !disc.getType().equals("⭕")) {
+                else if (!disc.get_flag_bomb() && disc.getType().equals("⬤")) {
                     disc.set_flag_bomb(true); // Mark the disc as processed
+                    if(!counterNew.contains(new Position(check_row, check_col))) {
+                        counterNew.add(new Position(check_row, check_col));
+                    }
                     counter++; // Count the disc
                     if (flip_enabler) {
                         discsFlipStackerCheck.add(new Position(check_row, check_col));
@@ -296,6 +299,17 @@ public class GameLogic implements PlayableLogic {
             }
         }
         return counter;
+    }
+
+    private void flagReset() {
+        for (int i = 0; i < BOARDSIZE; i++) {
+            for (int j = 0; j < BOARDSIZE; j++) {
+                Disc disc = boardDiscs[i][j];
+                if (disc != null) {
+                    disc.reset_flags();
+                }
+            }
+        }
     }
 
 

@@ -12,6 +12,7 @@ public abstract class AIPlayer extends Player {
     }
     @Override
     public boolean isHuman() {
+
         return false;
     }
 

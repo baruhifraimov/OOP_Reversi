@@ -2,10 +2,10 @@ import java.util.List;
 import java.util.Random;
 
 public class RandomAI extends AIPlayer {
+    Player randAI;
 
 
     public RandomAI(boolean isPlayerOne) {
-
         super(isPlayerOne);
     }
 

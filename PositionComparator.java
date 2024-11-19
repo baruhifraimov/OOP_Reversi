@@ -7,7 +7,7 @@ import java.util.Comparator;
  */
 
 public class PositionComparator implements Comparator<Position> {
-    private PlayableLogic gameStatus;
+    private final PlayableLogic gameStatus;
 
 
     /**
@@ -40,6 +40,10 @@ public class PositionComparator implements Comparator<Position> {
         }
 
         //  If the number of discs flipped is the same, prioritize the rightmost column
-        return Integer.compare(p2.col(), p1.col()); // 0 if col of p2 = cols of p1 , less than 0 if cols of p2 < cols of p1 , >0 if cols of p2 > cols of p1
+         int check = Integer.compare(p2.col(), p1.col()); // 0 if col of p2 = cols of p1 , less than 0 if cols of p2 < cols of p1 , >0 if cols of p2 > cols of p1
+        if(check == 0 ){
+            return Integer.compare(p2.row(),p1.row());
+        }
+        return check;
     }
 }

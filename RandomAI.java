@@ -2,7 +2,8 @@ import java.util.List;
 import java.util.Random;
 
 public class RandomAI extends AIPlayer {
-    Player randAI;
+    private Player randAI;
+    private Disc chosenDisc;
 
     /**
      * Constructs a RandomAI instance, associating it with a player role (Player One or Player Two).
@@ -47,7 +48,6 @@ public class RandomAI extends AIPlayer {
 
         // Select a random disc type
         int selectedDiscType = random.nextInt(3);
-        Disc chosenDisc;
 
         // Determine the disc to place based on random selection and greedddddyyy state
         if (selectedDiscType == 0) {

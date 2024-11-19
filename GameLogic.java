@@ -480,8 +480,9 @@ public class GameLogic implements PlayableLogic {
                     moveHistory.removeLast();
                 }
             } else {
-                System.out.println("No previous move available to undo.\n");
+                System.out.println("\tNo previous move available to undo.");
             }
+            System.out.println(); // blank line
         }
         // Undo Flips
         if (!undoCountStack.isEmpty() && (p1.isHuman() && p2.isHuman())) {

@@ -2,7 +2,8 @@ import java.util.List;
 import java.util.Random;
 
 public class GreedyAI extends AIPlayer{
-    Player greedddddyyy;
+    private Player greedddddyyy;
+    private Disc chosenDisc;
 
     /**
      * Constructs a GreedyAI instance, associating it with a player role (Player One or Player Two).
@@ -56,7 +57,7 @@ public class GreedyAI extends AIPlayer{
 
         // Select a random disc type
         int selectedDiscType = random.nextInt(3);
-        Disc chosenDisc;
+
 
         // Determine the disc to place based on random selection and greedddddyyy state
         if (selectedDiscType == 0) {

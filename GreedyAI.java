@@ -32,17 +32,21 @@ public class GreedyAI extends AIPlayer{
         } else {
             greedddddyyy = gameStatus.getSecondPlayer();
         }
-        // Get the list of available moves
+        // Get the list of available moves.
         List<Position> availableMoves = gameStatus.ValidMoves();
 
-        // Chooses the largest move
-        int maxFlips = 0;
-        for(Position i: availableMoves){
-            if(gameStatus.countFlips(i) > maxFlips){
-                maxFlips = gameStatus.countFlips(i);
-                maxMove = new Position(i.row(),i.col());
-            }
+        // check that there are more moves.
+        if (availableMoves.isEmpty()) {
+            gameStatus.isGameFinished();
+            return new Move(null, null);
         }
+
+        //sort by the comparator than we have defined , Biggest move will be first , and also the rightmost column when equals.
+        availableMoves.sort(new PositionComparator(gameStatus));
+
+        //takes the best move according to our comparator.
+        Position bestMove = availableMoves.getFirst();
+
         int moveCounter = availableMoves.size();
 
         // If no moves are available, return a default move or handle gracefully
@@ -53,26 +57,11 @@ public class GreedyAI extends AIPlayer{
         }
 
         // Select a greedy move
-        Position nextMove = maxMove;
-
-        // Select a random disc type
-        int selectedDiscType = random.nextInt(3);
-
-
-        // Determine the disc to place based on random selection and greedddddyyy state
-        if (selectedDiscType == 0) {
-            chosenDisc = new SimpleDisc(greedddddyyy);
-        } else if (selectedDiscType == 1 && greedddddyyy.getNumber_of_bombs() > 0) {
-            chosenDisc = new BombDisc(greedddddyyy);
-        } else if (selectedDiscType == 2 && greedddddyyy.getNumber_of_unflippedable() > 0) {
-            chosenDisc = new UnflippableDisc(greedddddyyy);
-        } else {
-            chosenDisc = new SimpleDisc(greedddddyyy);
-        }
+        chosenDisc = new SimpleDisc(greedddddyyy);
 
 
         // If the move succeeds, return the Move object
-        return new Move(nextMove, chosenDisc);
+        return new Move(bestMove, chosenDisc);
     }
 }
 

@@ -88,4 +88,15 @@ public class Position {
     public String toString() {
         return "(" + this.row + "," + this.col + ")";
     }
+
+    /**
+     * if there is more than one Move that is the biggest one , than choose the one that is in the rightmost slot
+     * @param o the object to be compared.
+     * @return an int , -1 if less than , 0 if equals , 1 if bigger than.
+     */
+  /*  @Override
+    public int compareTo(Position o) {
+        return this.col() - o.col();
+    }
+    */
 }

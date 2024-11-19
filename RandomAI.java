@@ -4,11 +4,22 @@ import java.util.Random;
 public class RandomAI extends AIPlayer {
     Player randAI;
 
-
+    /**
+     * Constructs a RandomAI instance, associating it with a player role (Player One or Player Two).
+     *
+     * @param isPlayerOne true if this AI is Player One, false if it is Player Two.
+     */
     public RandomAI(boolean isPlayerOne) {
         super(isPlayerOne);
     }
 
+    /**
+     * Makes a move for the random AI. The AI evaluates the current game state, selects a random
+     * valid move from the available options, and randomly determines the type of disc to place.
+     *
+     * @param gameStatus the current state of the game, encapsulated in a {@link PlayableLogic} object.
+     * @return a {@link Move} object containing the selected position and the chosen disc.
+     */
     @Override
     public Move makeMove(PlayableLogic gameStatus) {
         // Determine the greedddddyyy

@@ -7,13 +7,16 @@ public class GameLogic implements PlayableLogic {
     private Disc[][] boardDiscs;// Locating disc position on the board
     private boolean flip_enabler; // Flag for enabling collecting data for flipping discs
 
-
+    // Stacks for tracking game state
     private final Stack<Position> discsFlipStacker; // Collects data of disc to flip locations
     private final Stack<Position> discsFlipStackerCopy;
     private final Stack<Position> moveHistory; // Collects all the disc locations on the board
     private final Stack<Disc> flipHistory; // Collects data of setOwner.
     private final Stack<Integer> undoCountStack; // Collects data how many discs been flipped in each round
 
+    /**
+     * Constructs a new GameLogic instance with initialized game state.
+     */
     public GameLogic() {
         super();
         boardDiscs = new Disc[BOARDSIZE][BOARDSIZE];
@@ -25,6 +28,11 @@ public class GameLogic implements PlayableLogic {
         lastPlayer = getSecondPlayer();
     }
 
+    /**
+     * Determines the current player based on the last move.
+     *
+     * @return The current player.
+     */
     public Player currentPlayer() {
         if (lastPlayer == p1) {
             return p2;
@@ -32,6 +40,12 @@ public class GameLogic implements PlayableLogic {
         return p1;
     }
 
+    /**
+     * Gets the numerical identifier of a player.
+     *
+     * @param p The player.
+     * @return 1 for player 1, 2 for player 2.
+     */
     private int getPlayerNo(Player p) {
         if (p.equals(p1)) {
             return 1;
@@ -40,6 +54,9 @@ public class GameLogic implements PlayableLogic {
         }
     }
 
+    /**
+     * Initializes the board with the starting discs for each player.
+     */
     private void initBoard() {
         boardDiscs = new Disc[BOARDSIZE][BOARDSIZE];
         int midBoard = BOARDSIZE / 2;
@@ -49,6 +66,13 @@ public class GameLogic implements PlayableLogic {
         boardDiscs[midBoard - 1][midBoard] = new SimpleDisc(p2);
     }
 
+    /**
+     * Places a disc at a given position on the board if the move is valid.
+     *
+     * @param a    The position.
+     * @param disc The disc to be placed.
+     * @return True if the move was successful, otherwise false.
+     */
     @Override
     public boolean locate_disc(Position a, Disc disc) {
         boolean flag = false;
@@ -60,6 +84,13 @@ public class GameLogic implements PlayableLogic {
         return flag;
     }
 
+    /**
+     * Helper method to handle the actual placement of a disc on the board.
+     *
+     * @param disc The disc to be placed.
+     * @param a    The position.
+     * @return True if placement is successful, otherwise false.
+     */
     private boolean aux_locate_disc(Disc disc, Position a) {
 
         Player p = currentPlayer();
@@ -69,7 +100,7 @@ public class GameLogic implements PlayableLogic {
                 if (p.getNumber_of_bombs() > 0) {
                     p.reduce_bomb();
                     boardDiscs[a.row()][a.col()] = disc;
-                    moveHistory.addLast(new Position(a.row(), a.col()));
+                    moveHistory.addLast(new Position(a));
                     flipAction(a);
                     //System.out.printf("Player %d placed a %s in (%d,%d)\n No. of Bombs discs left: %d\n", no, disc.getType(), a.row(), a.col(), randAI.getNumber_of_bombs());
                     System.out.printf("Player %d placed a %s in (%d,%d)\n", no, disc.getType(), a.row(), a.col());
@@ -81,7 +112,7 @@ public class GameLogic implements PlayableLogic {
                 if (p.getNumber_of_unflippedable() > 0) {
                     p.reduce_unflippedable();
                     boardDiscs[a.row()][a.col()] = disc;
-                    moveHistory.addLast(new Position(a.row(), a.col()));
+                    moveHistory.addLast(new Position(a));
                     flipAction(a);
                     //System.out.printf("Player %d placed a %s in (%d,%d)" + "\n No. of Unflippable discs left: %d\n", no, disc.getType(), a.row(), a.col(), randAI.getNumber_of_unflippedable());
                     System.out.printf("Player %d placed a %s in (%d,%d)" + "\n ", no, disc.getType(), a.row(), a.col());
@@ -91,7 +122,7 @@ public class GameLogic implements PlayableLogic {
                 return true;
             case "⬤":
                 boardDiscs[a.row()][a.col()] = disc;
-                moveHistory.addLast(new Position(a.row(), a.col()));
+                moveHistory.addLast(new Position(a));
                 flipAction(a);
                 System.out.printf("Player %d placed a %s in (%d,%d)\n", no, disc.getType(), a.row(), a.col());
                 System.out.println();
@@ -103,17 +134,32 @@ public class GameLogic implements PlayableLogic {
 
     }
 
+    /**
+     * Retrieves the disc at a specified position.
+     *
+     * @param position The position.
+     * @return The disc at the position, or null if empty.
+     */
     @Override
     public Disc getDiscAtPosition(Position position) {
         return boardDiscs[position.row()][position.col()];
     }
 
+    /**
+     * Gets the size of the board.
+     *
+     * @return The board size.
+     */
     @Override
     public int getBoardSize() {
         return BOARDSIZE;
     }
 
-    //A valid move is one where at least one piece is reversed (flipped over).
+    /**
+     * Computes a list of valid positions for the current player to place a disc.
+     *
+     * @return A list of valid positions.
+     */
     @Override
     public List<Position> ValidMoves() {
         List<Position> vMoves = new ArrayList<>();
@@ -129,7 +175,12 @@ public class GameLogic implements PlayableLogic {
         return vMoves;
     }
 
-    // Taking position a and spreading checks x,y,z for possible flips
+    /**
+     * Calculates the number of discs that would be flipped if a disc were placed at a position.
+     *
+     * @param a The position.
+     * @return The number of discs to flip.
+     */
     @Override
     public int countFlips(Position a) {
         int down = auxCountFlips(a, +1, 0);
@@ -144,6 +195,11 @@ public class GameLogic implements PlayableLogic {
 
     }
 
+    /**
+     * Flips the discs on the board based on the position of the last placed disc.
+     *
+     * @param a The position where the last disc was placed.
+     */
     // Here the flip action takes a place, who to flip and how much
     private void flipAction(Position a) {
         int undoCount = 0;
@@ -169,6 +225,14 @@ public class GameLogic implements PlayableLogic {
 
     }
 
+    /**
+     * Helper method to calculate the number of discs that can be flipped in a given direction.
+     *
+     * @param a     The starting position.
+     * @param m_row The row direction to check.
+     * @param m_col The column direction to check.
+     * @return The number of flippable discs in the specified direction.
+     */
     private int auxCountFlips(Position a, int m_row, int m_col) {
         int flipCounter = 0;
         int rep_row = m_row, rep_col = m_col;
@@ -195,7 +259,7 @@ public class GameLogic implements PlayableLogic {
                         }
                     }
                 }
-                //Checks if the greedddddyyy turn is on.
+                //Checks if the player turn is on.
                 if (flip_enabler) {
                     // check if it can be flipped again (double check)
                     if (!disc.getType().equals("⭕")) {
@@ -204,7 +268,7 @@ public class GameLogic implements PlayableLogic {
                     }
                 }
             }
-            // if no discs left 'and' we got our current greedddddyyy on the other side
+            // if no discs left 'and' we got our current player on the other side
             else if (disc != null && disc.getOwner().equals(currentPlayer())) {
                 flipCounter += counterNew.size();
                 counterNew.clear();
@@ -225,6 +289,16 @@ public class GameLogic implements PlayableLogic {
         return flipCounter;
     }
 
+    /**
+     * Handles the explosion logic for bomb discs.
+     * Recursively counts the number of affected discs in all directions.
+     *
+     * @param bomb_pos              The position of the bomb.
+     * @param m_row                 The row direction to check.
+     * @param m_col                 The column direction to check.
+     * @param discsFlipStackerCheck A stack to track discs that can be flipped.
+     * @param counterNew            A list to avoid duplicate counting of discs.
+     */
     public void count_explode(Position bomb_pos, int m_row, int m_col, Stack<Position> discsFlipStackerCheck, ArrayList<Position> counterNew) {
         int check_row = bomb_pos.row() + m_row;
         int check_col = bomb_pos.col() + m_col;
@@ -271,6 +345,10 @@ public class GameLogic implements PlayableLogic {
         }
     }
 
+    /**
+     * Resets the flags of all discs on the board, clearing any temporary states.
+     */
+
     private void flagReset() {
         for (int i = 0; i < BOARDSIZE; i++) {
             for (int j = 0; j < BOARDSIZE; j++) {
@@ -282,27 +360,53 @@ public class GameLogic implements PlayableLogic {
         }
     }
 
-
+    /**
+     * Gets the first player in the game.
+     *
+     * @return The first player.
+     */
     @Override
     public Player getFirstPlayer() {
         return this.p1;
     }
 
+    /**
+     * Gets the second player in the game.
+     *
+     * @return The second player.
+     */
     @Override
     public Player getSecondPlayer() {
         return this.p2;
     }
 
+    /**
+     * Sets the players for the game.
+     *
+     * @param player1 Player 1.
+     * @param player2 Player 2.
+     */
     @Override
     public void setPlayers(Player player1, Player player2) {
         this.p1 = player1;
         this.p2 = player2;
     }
 
+    /**
+     * Checks whether it's the first player's turn.
+     *
+     * @return True if it's the first player's turn, otherwise false.
+     */
     @Override
     public boolean isFirstPlayerTurn() {
         return lastPlayer != p1;
     }
+
+    /**
+     * Checks whether the game has finished.
+     *
+     * @return True if the game is finished, otherwise false.
+     */
 
     @Override
     public boolean isGameFinished() {
@@ -330,6 +434,9 @@ public class GameLogic implements PlayableLogic {
         return false;
     }
 
+    /**
+     * Resets the game state to its initial configuration.
+     */
     @Override
     public void reset() {
         lastPlayer = p2;
@@ -342,32 +449,39 @@ public class GameLogic implements PlayableLogic {
         initBoard();
     }
 
+    /**
+     * Undoes the last move and any associated flips. The following actions occur:
+     * - Removes the last placed disc from the board.
+     * - Restores flipped discs to their previous owner.
+     * - Updates the current turn to the player who made the undone move.
+     */
     @Override
     public void undoLastMove() {
-        System.out.println("Undoing last move:");
         // Undo Moves
-        if (!moveHistory.isEmpty() && (p1.isHuman() && p2.isHuman())) {
-            int h_row = moveHistory.peek().row();
-            int h_col = moveHistory.peek().col();
-            System.out.printf("\tUndo: removing %s from (%d,%d)\n", boardDiscs[h_row][h_col].getType(), h_row, h_col);
-            lastPlayer = currentPlayer();
-            if (boardDiscs[h_row][h_col].getType().equals("💣")) {
-                boardDiscs[h_row][h_col].getOwner().add_bomb();
-                System.out.printf("\tRestoring %s Bombs: %d left\n", getPlayerNo(lastPlayer), lastPlayer.getNumber_of_bombs());
-                boardDiscs[h_row][h_col] = null;
-                moveHistory.removeLast();
-            } else if (boardDiscs[h_row][h_col].getType().equals("⭕")) {
-                boardDiscs[h_row][h_col].getOwner().add_unflippedable();
-                System.out.printf("\tRestoring %s Bombs: %d left\n", getPlayerNo(lastPlayer), lastPlayer.getNumber_of_unflippedable());
-                boardDiscs[h_row][h_col] = null;
-                moveHistory.removeLast();
+        if ((p1.isHuman() && p2.isHuman())) {
+            System.out.println("Undoing last move:");
+            if (!moveHistory.isEmpty()) {
+                int h_row = moveHistory.peek().row();
+                int h_col = moveHistory.peek().col();
+                System.out.printf("\tUndo: removing %s from (%d,%d)\n", boardDiscs[h_row][h_col].getType(), h_row, h_col);
+                lastPlayer = currentPlayer();
+                if (boardDiscs[h_row][h_col].getType().equals("💣")) {
+                    boardDiscs[h_row][h_col].getOwner().add_bomb();
+                    System.out.printf("\tRestoring %s Bombs: %d left\n", getPlayerNo(lastPlayer), lastPlayer.getNumber_of_bombs());
+                    boardDiscs[h_row][h_col] = null;
+                    moveHistory.removeLast();
+                } else if (boardDiscs[h_row][h_col].getType().equals("⭕")) {
+                    boardDiscs[h_row][h_col].getOwner().add_unflippedable();
+                    System.out.printf("\tRestoring %s Bombs: %d left\n", getPlayerNo(lastPlayer), lastPlayer.getNumber_of_unflippedable());
+                    boardDiscs[h_row][h_col] = null;
+                    moveHistory.removeLast();
+                } else {
+                    boardDiscs[h_row][h_col] = null;
+                    moveHistory.removeLast();
+                }
             } else {
-                boardDiscs[h_row][h_col] = null;
-                moveHistory.removeLast();
+                System.out.println("No previous move available to undo.\n");
             }
-
-        } else {
-            System.out.println("No previous move available to undo.");
         }
         // Undo Flips
         if (!undoCountStack.isEmpty() && (p1.isHuman() && p2.isHuman())) {

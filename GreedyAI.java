@@ -4,11 +4,23 @@ import java.util.Random;
 public class GreedyAI extends AIPlayer{
     Player greedddddyyy;
 
-
+    /**
+     * Constructs a GreedyAI instance, associating it with a player role (Player One or Player Two).
+     *
+     * @param isPlayerOne true if this AI is Player One, false if it is Player Two.
+     */
     public GreedyAI(boolean isPlayerOne) {
         super(isPlayerOne);
     }
 
+    /**
+     * Makes a move for the greedy AI. The AI evaluates the current game state and selects a move
+     * that flips the maximum number of discs on the board. If multiple moves are equally optimal,
+     * one is chosen arbitrarily. Additionally, the AI randomly selects the type of disc to place.
+     *
+     * @param gameStatus the current state of the game, encapsulated in a {@link PlayableLogic} object.
+     * @return a {@link Move} object containing the selected position and the chosen disc.
+     */
     @Override
     public Move makeMove(PlayableLogic gameStatus) {
         Random random = new Random();

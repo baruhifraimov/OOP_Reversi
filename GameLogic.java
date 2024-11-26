@@ -196,7 +196,7 @@ public class GameLogic implements PlayableLogic {
         int dul = auxCountFlips(a, -1, -1, counterNewCheck);
         int ddr = auxCountFlips(a, +1, +1, counterNewCheck);
         int ddl = auxCountFlips(a, +1, -1, counterNewCheck);
-
+        counterNewCheck.clear();
         return down + up + left + right + dur + dul + ddr + ddl;
 
     }
@@ -283,11 +283,13 @@ public class GameLogic implements PlayableLogic {
             // if no discs left 'and' we got our current player on the other side
             else if (disc != null && disc.getOwner().equals(currentPlayer())) {
                 flipCounter += counterNew.size();
-                for(Position i : counterNew){
-                    if(!counterNewCheck.contains(i)){
-                        counterNewCheck.add(i);
-                    }
-                }
+                counterNewCheck.addAll(counterNew);
+//                for(Position i : counterNew){
+//                    if(!counterNewCheck.contains(i)){
+//                        counterNewCheck.add(i);
+//                        counterNew.add(currentPosition);
+//                    }
+//                }
                 counterNew.clear();
                 while (!discsFlipStackerCheck.isEmpty()) {
                     discsFlipStacker.add(discsFlipStackerCheck.pop());
@@ -296,7 +298,7 @@ public class GameLogic implements PlayableLogic {
                 break;
             } else {
                 discsFlipStackerCheck.clear();
-                counterNewCheck.clear();
+
                 counterNew.clear();
                 break;
             }
@@ -332,7 +334,7 @@ public class GameLogic implements PlayableLogic {
                     if (!counterNew.contains(newPosition)) {
                         if (!counterNewCheck.contains(newPosition)) {
                             counterNew.add(newPosition);
-                            counterNewCheck.add(newPosition);
+//                            counterNewCheck.add(newPosition);
                         }
                     }
                     disc.set_flag_bomb(true); // Mark the bomb as processed
@@ -358,7 +360,7 @@ public class GameLogic implements PlayableLogic {
                     if (!counterNew.contains(newPosition)) {
                         if (!counterNewCheck.contains(newPosition)) {
                             counterNew.add(newPosition);
-                            counterNewCheck.add(newPosition);
+//                            counterNewCheck.add(newPosition);
                         }
                     }
                     if (flip_enabler) {

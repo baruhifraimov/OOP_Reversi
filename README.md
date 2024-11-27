@@ -1,9 +1,11 @@
 # **Reversi Game**
 ### _An OOP-Based Strategy Game_
+## 📂 Repository Information
+This project was forked to our repository to complete the development and enhancements. The original project provided a solid foundation, and we have built upon it to add new features and improvements.
 #### _Part of OOP course by Ariel University_
 ###### By: Baruh Ifraimov & Dor Cohen
 
-Reversi is a strategy-based board game implemented using **Object-Oriented Programming (OOP)** principles in Java. This project showcases clean code design, modular development, and problem-solving capabilities, making it an excellent demonstration of my programming skills and understanding of OOP concepts.
+Reversi is a strategy-based board game implemented using **Object-Oriented Programming (OOP)** principles in Java. This project showcases clean code design, modular development, and problem-solving capabilities, making it an excellent demonstration of our programming skills and understanding of OOP concepts.
 
 ---
 
@@ -44,14 +46,14 @@ The project is structured using an OOP-driven approach:
 
 ### **3. Features**
 - **Player Modes**:
-    - Human vs. Human
-    - Human vs. AI
-    - AI vs. AI (observe how AI strategies perform)
+  - Human vs. Human
+  - Human vs. AI
+  - AI vs. AI (observe how AI strategies perform)
 - **Dynamic Gameplay**:
-    - Track score in real-time.
-    - Experiment with new strategies using special discs.
+  - Track score in real-time.
+  - Experiment with new strategies using special discs.
 - **Extensible Design**:
-    - Easily add new disc types or AI strategies due to modularity.
+  - Easily add new disc types or AI strategies due to modularity.
 
 ---
 

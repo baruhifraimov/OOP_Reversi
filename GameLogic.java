@@ -490,24 +490,25 @@ public class GameLogic implements PlayableLogic {
         if ((p1.isHuman() && p2.isHuman())) {
             System.out.println("Undoing last move:");
             if (!moveHistory.isEmpty()) {
-                int h_row = moveHistory.peek().row();
-                int h_col = moveHistory.peek().col();
-                System.out.printf("\tUndo: removing %s from (%d,%d)\n", boardDiscs[h_row][h_col].getType(), h_row, h_col);
+                Position lastPosition = moveHistory.peek();
+                Disc lastDisc = boardDiscs[lastPosition.row()][lastPosition.col()];
+                Move lastMove = new Move(lastPosition, lastDisc);
+                lastMove.printUndoMove();
                 lastPlayer = currentPlayer();
-                if (boardDiscs[h_row][h_col].getType().equals("💣")) {
-                    boardDiscs[h_row][h_col].getOwner().add_bomb();
-                    boardDiscs[h_row][h_col] = null;
+                if (lastDisc.getType().equals("💣")) {
+                    lastDisc.getOwner().add_bomb();
+                    boardDiscs[lastPosition.row()][lastPosition.col()] = null;
                     moveHistory.removeLast();
-                } else if (boardDiscs[h_row][h_col].getType().equals("⭕")) {
-                    boardDiscs[h_row][h_col].getOwner().add_unflippedable();
-                    boardDiscs[h_row][h_col] = null;
+                } else if (lastDisc.getType().equals("⭕")) {
+                    lastDisc.getOwner().add_unflippedable();
+                    boardDiscs[lastPosition.row()][lastPosition.col()] = null;
                     moveHistory.removeLast();
                 } else {
-                    boardDiscs[h_row][h_col] = null;
+                    boardDiscs[lastPosition.row()][lastPosition.col()] = null;
                     moveHistory.removeLast();
                 }
             } else {
-                System.out.println("\tNo previous move available to undo.");
+                new Move(null, null).printUndoMove();
             }
         }
         // Undo Flips
@@ -517,8 +518,9 @@ public class GameLogic implements PlayableLogic {
                 for (int i = 0; i < j; i++) {
                     if (!flipHistory.isEmpty()) {
                         Position p = discsFlipStackerCopy.pop();
-                        System.out.printf("\tUndo: flipping back %s in (%d,%d)\n", flipHistory.peek().getType(), p.row(), p.col());
-                        flipHistory.pop().setOwner(lastPlayer);
+                        Disc d = flipHistory.pop();
+                        new Move(p, d).printUndoFlip(p, d);
+                        d.setOwner(lastPlayer);
                         j--;
                     }
                 }

@@ -1,10 +1,10 @@
 public class Move {
 
     // The position where the disc is placed
-    Position position;
+    private final Position position;
 
     // The disc placed at the given position
-    Disc disc;
+    private final Disc disc;
 
     /**
      * Constructs a Move with the specified position and disc.
@@ -34,4 +34,28 @@ public class Move {
     public Disc disc(){
         return this.disc;
     }
+/**
+ * Prints a message indicating the undoing of the last move.
+ * If there is no previous move, it prints a message indicating that.
+ */
+public void printUndoMove() {
+        if (disc != null) {
+            System.out.printf("\tUndo: removing %s from (%d,%d)\n", disc.getType(), position.row(), position.col());
+        } else {
+            System.out.println("\tNo previous move available to undo.");
+        }
+    }
+
+    /**
+     * Prints a message indicating the undoing of a disc flip.
+     *
+     * @param p the position where the disc is flipped back
+     * @param disc the disc that is flipped back
+     */
+    public void printUndoFlip(Position p, Disc disc) {
+        if (disc != null) {
+            System.out.printf("\tUndo: flipping back %s in (%d,%d)\n", disc.getType(), p.row(), p.col());
+        }
+    }
+
 }

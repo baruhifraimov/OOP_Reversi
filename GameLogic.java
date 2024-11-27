@@ -13,8 +13,7 @@ public class GameLogic implements PlayableLogic {
     private final Stack<Position> moveHistory; // Collects all the disc locations on the board
     private final Stack<Disc> flipHistory; // Collects data of setOwner.
     private final Stack<Integer> undoCountStack; // Collects data how many discs been flipped in each round
-
-    ArrayList<Position> counterNewCheck = new ArrayList<>();
+    private final ArrayList<Position> counterNewCheck = new ArrayList<>();
 
 
 
@@ -105,9 +104,10 @@ public class GameLogic implements PlayableLogic {
                     p.reduce_bomb();
                     boardDiscs[a.row()][a.col()] = disc;
                     moveHistory.addLast(new Position(a));
-                    flipAction(a);
+
                     //System.out.printf("Player %d placed a %s in (%d,%d)\n No. of Bombs discs left: %d\n", no, disc.getType(), a.row(), a.col(), randAI.getNumber_of_bombs());
                     System.out.printf("Player %d placed a %s in (%d,%d)\n", no, disc.getType(), a.row(), a.col());
+                    flipAction(a);
                     System.out.println();
                     lastPlayer = p;
                 }
@@ -117,9 +117,10 @@ public class GameLogic implements PlayableLogic {
                     p.reduce_unflippedable();
                     boardDiscs[a.row()][a.col()] = disc;
                     moveHistory.addLast(new Position(a));
-                    flipAction(a);
+
                     //System.out.printf("Player %d placed a %s in (%d,%d)" + "\n No. of Unflippable discs left: %d\n", no, disc.getType(), a.row(), a.col(), randAI.getNumber_of_unflippedable());
                     System.out.printf("Player %d placed a %s in (%d,%d)" + "\n ", no, disc.getType(), a.row(), a.col());
+                    flipAction(a);
                     System.out.println();
                     lastPlayer = p;
                 }
@@ -127,8 +128,9 @@ public class GameLogic implements PlayableLogic {
             case "⬤":
                 boardDiscs[a.row()][a.col()] = disc;
                 moveHistory.addLast(new Position(a));
-                flipAction(a);
+
                 System.out.printf("Player %d placed a %s in (%d,%d)\n", no, disc.getType(), a.row(), a.col());
+                flipAction(a);
                 System.out.println();
                 lastPlayer = p;
                 return true;
@@ -188,16 +190,17 @@ public class GameLogic implements PlayableLogic {
     @Override
     public int countFlips(Position a) {
 
-        int down = auxCountFlips(a, +1, 0, counterNewCheck);
-        int up = auxCountFlips(a, -1, 0, counterNewCheck);
-        int left = auxCountFlips(a, 0, -1, counterNewCheck);
-        int right = auxCountFlips(a, 0, +1, counterNewCheck);
-        int dur = auxCountFlips(a, -1, +1, counterNewCheck);
-        int dul = auxCountFlips(a, -1, -1, counterNewCheck);
-        int ddr = auxCountFlips(a, +1, +1, counterNewCheck);
-        int ddl = auxCountFlips(a, +1, -1, counterNewCheck);
+        int[][] directions = {
+                {+1, 0}, {-1, 0}, {0, -1}, {0, +1},
+                {-1, +1}, {-1, -1}, {+1, +1}, {+1, -1}
+        };
+
+        int totalFlips = 0;
+        for (int[] dir : directions) {
+            totalFlips += auxCountFlips(a, dir[0], dir[1], counterNewCheck);
+        }
         counterNewCheck.clear();
-        return down + up + left + right + dur + dul + ddr + ddl;
+        return totalFlips;
 
     }
 
@@ -345,14 +348,14 @@ public class GameLogic implements PlayableLogic {
                     }
 
                     // Trigger recursive explosions in all directions
-                    count_explode(newPosition, +1, 0, discsFlipStackerCheck, counterNew, counterNewCheck);
-                    count_explode(newPosition, -1, 0, discsFlipStackerCheck, counterNew, counterNewCheck);
-                    count_explode(newPosition, 0, +1, discsFlipStackerCheck, counterNew, counterNewCheck);
-                    count_explode(newPosition, 0, -1, discsFlipStackerCheck, counterNew, counterNewCheck);
-                    count_explode(newPosition, +1, +1, discsFlipStackerCheck, counterNew, counterNewCheck);
-                    count_explode(newPosition, +1, -1, discsFlipStackerCheck, counterNew, counterNewCheck);
-                    count_explode(newPosition, -1, +1, discsFlipStackerCheck, counterNew, counterNewCheck);
-                    count_explode(newPosition, -1, -1, discsFlipStackerCheck, counterNew, counterNewCheck);
+                    int[][] directions = {
+                            {+1, 0}, {-1, 0}, {0, +1}, {0, -1},
+                            {+1, +1}, {+1, -1}, {-1, +1}, {-1, -1}
+                    };
+
+                    for (int[] dir : directions) {
+                        count_explode(newPosition, dir[0], dir[1], discsFlipStackerCheck, counterNew, counterNewCheck);
+                    }
                 }
                 // If it's a regular disc and not yet processed
                 else if (!disc.get_flag_bomb() && disc.getType().equals("⬤")) {

@@ -1,13 +1,13 @@
 /**
  * The Disc interface defines the characteristics of a game in a chess-like game.
- * Implementing classes should provide information about the greedddddyyy who owns the Disc.
+ * Implementing classes should provide information about the player who owns the Disc.
  */
 public interface Disc {
 
     /**
-     * Get the greedddddyyy who owns the Disc.
+     * Get the player who owns the Disc.
      *
-     * @return The greedddddyyy who is the owner of this game disc.
+     * @return The player who is the owner of this game disc.
      */
     Player getOwner();
 
@@ -18,7 +18,7 @@ public interface Disc {
     void setFlipped(boolean flipped);
 
     /**
-     * Set the greedddddyyy who owns the Disc.
+     * Set the player who owns the Disc.
      *
      */
     void setOwner(Player player);
